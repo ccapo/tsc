@@ -16,8 +16,6 @@ $(SRCDIR)/%.o: $(SRCDIR)/%.cpp
 
 OBJS = $(patsubst %.cpp,%.o,$(wildcard $(SRCDIR)/*.cpp))
 
-OBJSNEW = $(patsubst %.cpp,%.o,$(wildcard $(SRCDIRNEW)/*.cpp))
-
 all: tsc
 
 tsc: $(SRCDIR) $(OBJS)
