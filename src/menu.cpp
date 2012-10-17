@@ -52,25 +52,25 @@
 #include "main.hpp"
 
 // The constructor
-Menu::Menu(): selection(NONE), subselection(NONE), displayInfoPage(false), displayGameMenu(false), displayItemShopMenu(false), displayEquipShopMenu(false), displayInnMenu(false), displayFerryMenu(false), displayDeathMsg(false)
+Menu::Menu(): selection(NONE), subselection(NONE), displayInfoPage(false), displayGameMenu(false), displayItemShopMenu(false), displayEquipShopMenu(false), displayInnMenu(false), displayFerryMenu(false), displayDeathMsg(false), inGame(false)
 {
-  int w = 3*DISPLAY_WIDTH/4 - 2, h = NMSGS + 4;
+  //int w = 3*DISPLAY_WIDTH/4 - 2, h = NMSGS + 4;
+  //int x = 0, y = DISPLAY_HEIGHT + 3;
 
   // Background image for main menu
   bg_img = new TCODImage("data/img/menu_bg.png");
 
   con = NULL;
   subcon = NULL;
-
-  msgcon = new TCODConsole(w, h);
-  msgcon->printFrame(0, 0, w, h, false, TCOD_BKGND_SET, "Message Log");
+  msgcon = NULL;
 }
 
 // This method updates the main menu
 void Menu::updateMainMenu(TCOD_key_t key)
 {
   static int menuCursor = 0;
-  int w = 24, h = DISPLAY_HEIGHT/2;
+  //int w = 24, h = DISPLAY_HEIGHT/2;
+  int w = 64, h = DISPLAY_HEIGHT/2;
   const char options[NMAIN][CHARMAX] = {
             "%cNew Game %c",
             "%cLoad Game%c",
@@ -119,6 +119,14 @@ void Menu::updateMainMenu(TCOD_key_t key)
   con->print(x, h - 3, "%cv"VERSION"%c", TCOD_COLCTRL_2, TCOD_COLCTRL_STOP);
   //con->print(x, h - 1, "%cChris Capobianco%c", TCOD_COLCTRL_2, TCOD_COLCTRL_STOP);
 
+  //int istart = 256;
+  //for(int i = 0; i < 32; i++) con->putChar(x + i, h - 12, istart + i, TCOD_BKGND_NONE); istart += 32;
+  //for(int i = 0; i < 32; i++) con->putChar(x + i, h - 11, istart + i, TCOD_BKGND_NONE); istart += 32;
+  //for(int i = 0; i < 32; i++) con->putChar(x + i, h - 10, istart + i, TCOD_BKGND_NONE); istart += 32;
+  //for(int i = 0; i < 32; i++) con->putChar(x + i, h - 9,  istart + i, TCOD_BKGND_NONE); istart += 32;
+  //for(int i = 0; i < 32; i++) con->putChar(x + i, h - 8,  istart + i, TCOD_BKGND_NONE); istart += 32;
+  //for(int i = 0; i < 32; i++) con->putChar(x + i, h - 7,  istart + i, TCOD_BKGND_NONE); istart += 32;
+
   // Print the menu options
   y = NMAIN;
   for(int i = 0; i < NMAIN; i++)
@@ -140,7 +148,8 @@ void Menu::updateMainMenu(TCOD_key_t key)
 // This method renders the main menu
 void Menu::renderMainMenu()
 {
-  int w = 24, w2 = DISPLAY_WIDTH/2, h = DISPLAY_HEIGHT/2;
+  //int w = 24, w2 = DISPLAY_WIDTH/2, h = DISPLAY_HEIGHT/2;
+  int w = 64, w2 = DISPLAY_WIDTH/2, h = DISPLAY_HEIGHT/2;
 
   // Blit the background image to the root console
   TCODConsole::root->clear();
@@ -158,7 +167,7 @@ void Menu::updateInfoPage(TCOD_key_t key)
   const char options[NINFO][CHARMAX] = {
             "Move/Attack        :: Arrow Keys       ",
             "Use Magic          :: Left Mouse Button",
-            "Select Magic       :: Shift            ",
+            "Select Magic       :: Control          ",
             "Toggle Menu/Cancel :: Escape           ",
             "Select/Action      :: Enter            ",
             "Toggle Music       :: Pause            ",
@@ -195,7 +204,7 @@ void Menu::updateInfoPage(TCOD_key_t key)
   x = 4; y += 4;
   subcon->print(x, y, "%cSaving%c", TCOD_COLCTRL_1, TCOD_COLCTRL_STOP);
   y += 2;
-  subcon->printRect(x, y, xend, yend, "Whenever the Player returns to the %cWorld Map,%c the game will automatically overwrite the existing save file.\n\n\nIf the Player expires, death is %cpermanent%c as the save file will be %cdeleted.%c", TCOD_COLCTRL_2, TCOD_COLCTRL_STOP, TCOD_COLCTRL_2, TCOD_COLCTRL_STOP, TCOD_COLCTRL_2, TCOD_COLCTRL_STOP);
+  subcon->printRect(x, y, xend, yend, "Whenever the Player returns to the %cWorld Map%c, the game will automatically overwrite the existing save file.\n\n\nIf the Player expires, death is %cpermanent%c as the save file is %cdeleted%c.", TCOD_COLCTRL_2, TCOD_COLCTRL_STOP, TCOD_COLCTRL_2, TCOD_COLCTRL_STOP, TCOD_COLCTRL_2, TCOD_COLCTRL_STOP);
 
   subcon->print(xend, yend + 2, "%c[Enter]%c", TCOD_COLCTRL_1, TCOD_COLCTRL_STOP);
 }
@@ -203,10 +212,19 @@ void Menu::updateInfoPage(TCOD_key_t key)
 // This method renders the info page
 void Menu::renderInfoPage()
 {
-  int w = DISPLAY_WIDTH/2, h = DISPLAY_HEIGHT/2, h2 = SCREEN_HEIGHT/2 - h/2 + 1;
+  int w = DISPLAY_WIDTH/2, h = DISPLAY_HEIGHT/2, h2;
 
   // Blit the info screen to the root console
-  TCODConsole::blit(subcon, 0, 0, w, h, TCODConsole::root, w/2, h2, 1.0f, 0.75f);
+  if(inGame)
+  {
+    h2 = h/2;
+    TCODConsole::blit(subcon, 0, 0, w, h, TCODConsole::root, w/2, h2, 1.0f, 1.0f);
+  }
+  else
+  {
+    h2 = SCREEN_HEIGHT/2 - h/2 + 1;
+    TCODConsole::blit(subcon, 0, 0, w, h, TCODConsole::root, w/2, h2, 1.0f, 0.75f);
+  }
 }
 
 // This method updates the introduction page
@@ -717,6 +735,7 @@ void Menu::updateEquipMenu(int subMenuCursor, int subSubMenuCursor)
     // List Current Stats
     y = NEQUIPTYPE + 11;
     subcon->print(x, y, "%cStats%c", TCOD_COLCTRL_4, TCOD_COLCTRL_STOP);
+    subcon->putChar(x + 8, y, game.player.sym_right, TCOD_BKGND_NONE);
     y += 2;
 
     float xpfraction = static_cast<float>(game.player.xp)/static_cast<float>(game.player.xpnext);
@@ -960,6 +979,7 @@ void Menu::updateEquipMenu(int subMenuCursor, int subSubMenuCursor)
 
     y = NEQUIPTYPE + 11;
     subcon->print(x, y, "%cStats%c", TCOD_COLCTRL_4, TCOD_COLCTRL_STOP);
+    subcon->putChar(x + 8, y, game.player.sym_right, TCOD_BKGND_NONE);
     y += 2;
 
     float xpfraction = static_cast<float>(game.player.xp)/static_cast<float>(game.player.xpnext);
@@ -1820,7 +1840,7 @@ bool Menu::updateFerryMenu(TCOD_key_t key)
   int w = DISPLAY_WIDTH/2, h = DISPLAY_HEIGHT/2;
   int ws = w - 17, hs = h - 2;
   int xstart = 3, ystart = 3, xend = ws - 6, yend = hs - 6;
-  WorldMap *wmap = &game.world[0];
+  //WorldMap *wmap = &game.world[0];
   int id = game.worldID - 1, idprev = id - 1, idnext = id + 1;
   char options[NFERRY][CHARMAX] = {
             "%cTake Ferry%c",

@@ -79,7 +79,7 @@ class Item
   Stats stats;                // Item Stats
   int x, y;                   // Item Position
   TCODColor colour;           // Item Colour
-  char sym;                   // Item Symbol
+  int sym;                   // Item Symbol
   float mass;                 // Item Mass
   float activeTime;           // Length of time an item is active
   bool inUse;                 // Item In Use flag

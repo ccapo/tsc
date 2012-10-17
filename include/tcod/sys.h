@@ -1,6 +1,6 @@
 /*
 * libtcod 1.5.1
-* Copyright (c) 2008,2009,2010 Jice & Mingos
+* Copyright (c) 2008,2009,2010,2012 Jice & Mingos
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
@@ -42,6 +42,7 @@ TCODLIB_API void TCOD_sys_get_current_resolution(int *w, int *h);
 TCODLIB_API void TCOD_sys_get_fullscreen_offsets(int *offx, int *offy);
 TCODLIB_API void TCOD_sys_update_char(int asciiCode, int fontx, int fonty, TCOD_image_t img, int x, int y);
 TCODLIB_API void TCOD_sys_get_char_size(int *w, int *h);
+TCODLIB_API void *TCOD_sys_get_sdl_window();
 
 typedef enum {
   TCOD_EVENT_KEY_PRESS=1,
@@ -63,6 +64,8 @@ TCODLIB_API bool TCOD_sys_delete_directory(const char *path);
 TCODLIB_API bool TCOD_sys_is_directory(const char *path);
 TCODLIB_API TCOD_list_t TCOD_sys_get_directory_content(const char *path, const char *pattern);
 TCODLIB_API bool TCOD_sys_file_exists(const char * filename, ...);
+TCODLIB_API bool TCOD_sys_read_file(const char *filename, unsigned char **buf, uint32 *size);
+TCODLIB_API bool TCOD_sys_write_file(const char *filename, unsigned char *buf, uint32 size);
 
 /* clipboard */
 TCODLIB_API void TCOD_sys_clipboard_set(const char *value);

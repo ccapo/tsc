@@ -62,6 +62,15 @@ enum ECreatureType
   NCREATURETYPES
 };
 
+enum ECreatureSubType
+{
+  CREATURESUBTYPE_PEON,
+  CREATURESUBTYPE_COMMANDER,
+  CREATURESUBTYPE_LEADER,
+  CREATURESUBTYPE_SPECIAL,
+  NCREATURESUBTYPES
+};
+
 enum ENpcType
 {
   NPCTYPE_ITEMSHOPKEEPER,
@@ -88,10 +97,12 @@ class Creature
   int lvl;                                               // Creature's Level
   int x, y;                                              // Creature Position
   ECreatureType creatureType;                            // Creature Type
+  ECreatureSubType creatureSubType;                      // Creature SubType
   char name[CHARMAX];                                    // Creature Name
   TCODColor colour;                                      // Creature Colour
-  char sym;                                              // Creature Symbol
-  float walkTimer;                                       // Creature's Walk Timer
+  int sym;                                               // Creature Symbol
+  int walkWait;                                          // Creature's Walk Wait
+  float scentThreshold;                                  // Creature's Scent Threshold
   bool inUse;                                            // Creature's In Use flag
   //TCODPath *path;                                      // Creature's Path object
 
@@ -113,7 +124,7 @@ class Corpse
   public:
   int x, y;                                              // Corpse Position
   TCODColor colour;                                      // Corpse Colour
-  char sym;                                              // Corpse Symbol
+  int sym;                                               // Corpse Symbol
   bool inUse;                                            // Corpse In Use flag
 
   Corpse();                                              // The Default Corpse Constructor
@@ -131,7 +142,7 @@ class Hide
   char name[CHARMAX];                                    // Hide Name
   char label[CHARMAX];                                   // Hide Label
   TCODColor colour;                                      // Hide Colour
-  char sym;                                              // Hide Symbol
+  int sym;                                               // Hide Symbol
   float mass;                                            // Hide Mass
   bool inUse;                                            // Hide In Use flag
 
@@ -168,8 +179,8 @@ class Npc
   ENpcType npcType;                                      // Npc Type
   char label[CHARMAX];                                   // Npc Label
   TCODColor colour;                                      // Npc Colour
-  char sym;                                              // Npc Symbol
-  float walkTimer;                                       // Npc Walk Timer
+  int sym;                                               // Npc Symbol
+  float walkWait;                                        // Npc Walk Wait
   bool inUse;                                            // Npc In Use flag
   TCODPath *path;                                        // Npc Path object
 

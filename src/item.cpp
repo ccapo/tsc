@@ -51,7 +51,7 @@
 #include "main.hpp"
 
 // The Default Item Constructor
-Item::Item(): x(0), y(0), colour(TCODColor::green), sym('?'),
+Item::Item(): x(0), y(0), colour(TCODColor::white), sym(CHAR_MUSHROOM),
               mass(0.1f), activeTime(0.0f), inUse(false)
 {
   sprintf(label, "%s", "Unknown Mushroom");              // Label
@@ -75,7 +75,7 @@ Item::Item(): x(0), y(0), colour(TCODColor::green), sym('?'),
 // The Item Constructor
 Item::Item(const char label0[], const char name0[], const char desc0[],
            int hp0, int str0, int spd0, int mp0, int wil0, int acu0,
-           float mass0, float activeTime0): x(0), y(0), colour(TCODColor::green), sym('?'),
+           float mass0, float activeTime0): x(0), y(0), colour(TCODColor::white), sym(CHAR_MUSHROOM),
                                             mass(mass0), activeTime(activeTime0), inUse(true)
 {
   sprintf(label, "%s", label0); // Label

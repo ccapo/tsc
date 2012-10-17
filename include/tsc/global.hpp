@@ -49,14 +49,16 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+using namespace std;
+
 // Version
-#define VERSION "0.2.0"
+#define VERSION "0.3.0"
 
 // Save game magic number
 #define SAVEGAME_MAGIC_NUMBER 0xFD051E4F
 
 // Save game file name
-#define SAVEGAME_FILENAME "data/save/savedgame.gz"
+#define SAVEGAME_FILENAME "data/.save/savedgame.gz"
 
 // Size of the map portion shown on-screen
 #define DISPLAY_WIDTH 120
@@ -104,20 +106,11 @@
 #define NREGIONS 4
 #define NITEMS_REGION (NITEMS/NREGIONS)
 
-// Number of temples
-#define NTEMPLES 5
-
-// Number of towns
-#define NTOWNS 7
-
 // Number of cave regions
-#define NCAVES 4
+#define NCAVE_REGIONS 4
 
 // Number of cave levels per region
-#define NLEVELS ((NCAVES - 1)/3)
-
-// Number of world maps
-#define NWORLD (NTEMPLES + NTOWNS + 1)
+#define NLEVELS_REGION 1
 
 // Number of commands in the info menu
 #define NINFO 8
@@ -127,9 +120,6 @@
 
 // Number of cells that border a cell
 #define NBORDER 8
-
-// Magic charge bar
-#define TCOD_CHAR_CHARGEBAR 1
 
 // Torch Information
 #define TORCH_RADIUS 24.0f
@@ -155,8 +145,8 @@
 #define STRMIN 10
 #define STRMAX 50
 
-#define SPDMIN 12
-#define SPDMAX 50
+#define SPDMIN 0
+#define SPDMAX 24
 
 #define MPMIN 15
 #define MPMAX 250

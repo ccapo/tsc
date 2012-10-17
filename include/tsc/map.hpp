@@ -50,23 +50,46 @@
 
 #include "global.hpp"
 
-// Background music identifiers
-enum EWorldMap
+// World Map Location Identifiers
+enum ETemple
 {
   TEMPLE_LIGHT,
   TEMPLE_FIRE,
   TEMPLE_WATER,
   TEMPLE_WIND,
   TEMPLE_EARTH,
-  TOWN_01,
+  NTEMPLES
+};
+
+enum ETown
+{
+  TOWN_01 = NTEMPLES,
   TOWN_02,
   TOWN_03,
   TOWN_04,
   TOWN_05,
   TOWN_06,
   TOWN_07,
-  CAVE_SERPENTINE,
-  NWORLDMAPLOCATIONS
+  TOWN_08,
+  TOWN_09,
+  TOWN_10,
+  TOWN_11,
+  TOWN_12,
+  NTMP,
+  NTOWNS = NTMP - NTEMPLES
+};
+
+enum ECaves
+{
+  CAVE_01 = NTEMPLES + NTOWNS,
+  CAVE_02,
+  CAVE_03,
+  CAVE_04,
+  CAVE_05,
+  CAVE_06,
+  CAVE_07,
+  NWORLD,
+  NCAVES = NWORLD - NTEMPLES - NTOWNS
 };
 
 class Player;
@@ -85,6 +108,9 @@ class WorldMap
   Npc npcs[NPCMAX];
   Location locations[NLOCATIONMAX];
 
+  // Coordinate of console cell (0, 0) in the map
+  int display_x, display_y;
+
   TCODImage *img;
   TCODImage *img_thumb;
 
@@ -93,6 +119,20 @@ class WorldMap
 
   char label[CHARMAX];
   int musicID;
+
+  // Colour map
+  float hWater;
+  float hSand;
+  float hGrass;
+  float hMax;
+  TCODColor colourMap[NCOLOURMAP];
+
+  TCODColor darkWall;
+  TCODColor lightWall;
+  TCODColor darkGround;
+  TCODColor lightGround;
+
+  map<int, Location> locWorld;
 
   // The default world map constructor
   WorldMap();
@@ -115,12 +155,16 @@ class WorldMap
   // Loads a map
   void loadMap(const char filename[], const char name[], int musicIndex, bool init = true);
 
+  // Moves the display
+  void moveDisplay(int x, int y);
+
   inline bool isFov1xWalkable(int x, int y) { return fov1x->isWalkable(x, y); }
   inline bool isFov1xTransparent(int x, int y) { return fov1x->isTransparent(x, y); }
   inline bool isFov2xWalkable(int x, int y) { return fov2x->isWalkable(x, y); }
   inline bool isFov2xTransparent(int x, int y) { return fov2x->isTransparent(x, y); }
 
   inline int getLocationID(int x, int y) { return cells[x + IMAGE_WIDTH*y].locationID; }
+  void addWorldMapLocations();
   void addLocation(int x, int y, const char name[], TCODColor colour, char sym);
 
   inline int getNpcID(int x, int y) { return cells[x + IMAGE_WIDTH*y].creatureID; }
@@ -157,6 +201,11 @@ class CaveMap
 
   char label[CHARMAX];
   int musicID;
+
+  TCODColor darkWall;
+  TCODColor lightWall;
+  TCODColor darkGround;
+  TCODColor lightGround;
 
   // The default cave map constructor
   CaveMap();

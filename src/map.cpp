@@ -50,39 +50,6 @@
 
 #include "main.hpp"
 
-// Colour map
-const float hWater = 0.0f;
-const float hSand = 0.1f;
-const float hGrass = 0.5f;
-const float hMax = 1.0f;
-const TCODColor colourMap[NCOLOURMAP] = {
-  TCODColor(47,47,64),    // 0, deep water
-  TCODColor(111,127,159), // 1, water-sand transition
-  TCODColor(191,191,159), // 2, sand
-  TCODColor(63,127,31),   // 3, sand-grass transition
-  TCODColor(31,63,31)};   // 4, grass
-
-const TCODColor darkWall = TCODColor::darkestGrey;
-const TCODColor lightWall = TCODColor(130,110,50);
-const TCODColor darkGround = TCODColor::darkerGrey;
-const TCODColor lightGround = TCODColor(200,180,50);
-
-// The explicit construction of the world map locations
-const Location locWorld[NWORLDMAPLOCATIONS] = {
-  Location(DISPLAY_WIDTH/2, DISPLAY_HEIGHT/2, "Light Temple", TCODColor::lighterYellow, TCOD_CHAR_RADIO_SET),
-  Location(76, 24, "Fire Temple",  TCODColor::red, TCOD_CHAR_RADIO_SET),
-  Location(61, 66, "Water Temple", TCODColor::blue, TCOD_CHAR_RADIO_SET),
-  Location(13,  6, "Wind Temple",  TCODColor::yellow, TCOD_CHAR_RADIO_SET),
-  Location(22, 47, "Earth Temple", TCODColor::green, TCOD_CHAR_RADIO_SET),
-  Location(57,  6, "Rivendell",    TCODColor::black, TCOD_CHAR_RADIO_SET),
-  Location( 9, 16, "Edoras",       TCODColor::black, TCOD_CHAR_RADIO_SET),
-  Location(38, 22, "Erebor",       TCODColor::black, TCOD_CHAR_RADIO_SET),
-  Location(76, 53, "Dol Amroth",   TCODColor::black, TCOD_CHAR_RADIO_SET),
-  Location(37, 59, "Khazad-dum",   TCODColor::black, TCOD_CHAR_RADIO_SET),
-  Location(95, 40, "Isengard",     TCODColor::black, TCOD_CHAR_RADIO_SET),
-  Location(67, 30, "Minas Tirith", TCODColor::black, TCOD_CHAR_RADIO_SET),
-  Location(103, 62, "Serpentine Caves", TCODColor::darkSepia, TCOD_CHAR_RADIO_SET)};
-
 // The default map constructor
 WorldMap::WorldMap(): nlocations(0), displayWeather(true), musicID(SOUND_WORLD_MAP)
 {
@@ -93,14 +60,22 @@ WorldMap::WorldMap(): nlocations(0), displayWeather(true), musicID(SOUND_WORLD_M
   // Image and thumbnail
   img = new TCODImage(IMAGE_WIDTH2, IMAGE_HEIGHT2);
   img_thumb = new TCODImage(IMAGE_WIDTH2/4, IMAGE_HEIGHT2/4);
+
+  // Heightmap Thresholds
+  hWater = 0.0f;
+  hSand = 0.1f;
+  hGrass = 0.5f;
+  hMax = 1.0f;
+
+  darkWall = TCODColor::darkestGrey;
+  lightWall = TCODColor(130,110,50);
+  darkGround = TCODColor::darkerGrey;
+  lightGround = TCODColor(200,180,50);
 }
 
 // Updates World Map
 void WorldMap::update()
 {
-  static float offsetW = 0.18f; // This is the noise offset to make it scroll for waves
-  static float offsetC = 0.23f; // This is the noise offset to make it scroll for clouds
-
   if(displayWeather)
   {
     // Cycle through all the cells
@@ -109,13 +84,13 @@ void WorldMap::update()
       for(int y = 0; y < IMAGE_HEIGHT2; y++)
       {
         // Now for the fun part!
-        float c[3], w[3];
-        w[0] = 60.0f*(x + 0.4f*offsetW)/IMAGE_WIDTH2;
-        w[1] = 60.0f*(y + 0.6f*offsetW)/IMAGE_HEIGHT2;
-        w[2] = (60*offsetW)/IMAGE_WIDTH2; // Z axis for the waves
-        c[0] = 2.0f*(x + 0.33f*offsetC)/IMAGE_WIDTH2;
-        c[1] = (y + offsetC)/IMAGE_HEIGHT2;
-        c[2] = (2*offsetC)/IMAGE_WIDTH2;  // Z axis for the clouds
+        float w[3], c[3];
+        w[0] = 60.0f*(x + 0.4f*game.offsetW)/IMAGE_WIDTH2;
+        w[1] = 60.0f*(y + 0.6f*game.offsetW)/IMAGE_HEIGHT2;
+        w[2] = (60*game.offsetW)/IMAGE_WIDTH2; // Z axis for the waves
+        c[0] = 2.0f*(x + 0.33f*game.offsetC)/IMAGE_WIDTH2;
+        c[1] = (y + game.offsetC)/IMAGE_HEIGHT2;
+        c[2] = (2*game.offsetC)/IMAGE_WIDTH2;  // Z axis for the clouds
 
         // First, reset the colour to base
         int offset = x + IMAGE_WIDTH2*y;
@@ -144,8 +119,6 @@ void WorldMap::update()
         img->putPixel(x, y, subcells[offset].finalColour);
       }
     }
-    offsetW += 0.23f; // increase the waves offset to scroll the noises in the next frame
-    offsetC += 0.27f; // increase the clouds offset to scroll the noises in the next frame
   }
 }
 
@@ -227,6 +200,14 @@ void WorldMap::generateMap()
 {
   TCODHeightMap *hmap = new TCODHeightMap(IMAGE_WIDTH2, IMAGE_HEIGHT2);
 
+  // Colour map
+  int i = 0;
+  colourMap[i++] = TCODColor(47,47,64);    // 0, deep water
+  colourMap[i++] = TCODColor(111,127,159); // 1, water-sand transition
+  colourMap[i++] = TCODColor(191,191,159); // 2, sand
+  colourMap[i++] = TCODColor(63,127,31);   // 3, sand-grass transition
+  colourMap[i++] = TCODColor(31,63,31);    // 4, grass
+
   generateHM(hmap);
 
   for(int x = 0; x < IMAGE_WIDTH2; x++)
@@ -286,10 +267,7 @@ void WorldMap::generateMap()
 
   // Assign the location of all the places on the world map
   nlocations = NWORLD;
-  for(int i = 0; i < nlocations; i++)
-  {
-    addLocation(locWorld[i].x, locWorld[i].y, locWorld[i].name, locWorld[i].colour, locWorld[i].sym);
-  }
+  addWorldMapLocations();
 
   delete hmap;
   hmap = NULL;
@@ -307,85 +285,157 @@ void WorldMap::loadMap(const char filename[], const char name[], int musicIndex,
   img = new TCODImage(filename);
   //img_thumb = new TCODImage(filename);
 
-  // Cycle through all the map's cells
-  for(int x = 0; x < IMAGE_WIDTH2; x++)
-  {
-    for(int y = 0; y < IMAGE_HEIGHT2; y++)
-    {
-      // Assign colours according to it
-      int offset = x + IMAGE_WIDTH2*y;
-      TCODColor c = img->getPixel(x, y);
-      subcells[offset].baseColour = c;
-      subcells[offset].isWater = false;
-      fov2x->setProperties(x, y, true, true);
-
-      // Locate the pixels that are assigned to be water (World)
-      if((c.r <= 111 && c.r >= 47) && (c.g <= 127 && c.g >= 47) && (c.b <= 159 && c.b >= 64))
-      {
-        subcells[offset].isWater = true;
-        fov2x->setProperties(x, y, true, false);
-      }
-
-      // Locate the pixels that are assigned to be sand (World)
-      if((c.r >= 111 && c.r <= 191) && (c.g >= 127 && c.g <= 191) && (c.b == 159))
-      {
-        fov2x->setProperties(x, y, true, false);
-      }
-
-      // Locate the pixels that are assigned to be a flagstones (Towns/Temples)
-      if(c.r == c.g && c.g == c.b && c.b == c.r)
-      {
-        fov2x->setProperties(x, y, true, true);
-      }
-
-      // Locate the pixels that are assigned to be a wall (Towns/Temples)
-      if(c.r == 95 && c.g == 95 && c.b == 95)
-      {
-        fov2x->setProperties(x, y, true, false);
-      }
-
-      // Locate the pixels that are assigned to be a table/desk (Towns/Temples)
-      //if(c.r == 159 && c.g == 106 && c.b == 39)
-      //{
-      //  fov2x->setProperties(x, y, true, false);
-      //}
-    }
-  }
-
-  // Set walk and transparent information in the normal resolution map
-  for(int x = 0; x < IMAGE_WIDTH; x++)
-  {
-    for(int y = 0; y < IMAGE_HEIGHT; y++)
-    {
-      bool trans = true, walk = true;
-      if(!isFov2xTransparent(2*x    , 2*y    )) trans = false;
-      if(!isFov2xTransparent(2*x + 1, 2*y    )) trans = false;
-      if(!isFov2xTransparent(2*x    , 2*y + 1)) trans = false;
-      if(!isFov2xTransparent(2*x + 1, 2*y + 1)) trans = false;
-      if(!isFov2xWalkable(2*x    , 2*y    )) walk = false;
-      if(!isFov2xWalkable(2*x + 1, 2*y    )) walk = false;
-      if(!isFov2xWalkable(2*x    , 2*y + 1)) walk = false;
-      if(!isFov2xWalkable(2*x + 1, 2*y + 1)) walk = false;
-      fov1x->setProperties(x, y, trans, walk);
-    }
-  }
+  int offset;
 
   if(game.worldID == 0)
   {
+    // Cycle through all the map's cells
+    for(int x = 0; x < IMAGE_WIDTH2; x++)
+    {
+      for(int y = 0; y < IMAGE_HEIGHT2; y++)
+      {
+        // Assign colours according to it
+        offset = x + IMAGE_WIDTH2*y;
+        TCODColor c = img->getPixel(x, y);
+        subcells[offset].baseColour = c;
+        subcells[offset].isWater = false;
+        fov2x->setProperties(x, y, true, true);
+
+        ///*** These are based on my colours for the world map ***///
+
+        // Locate the pixels that are assigned to be water (World)
+        //if((c.r >= 47 && c.r < 111) && (c.g >= 47 && c.g < 127) && (c.b >= 64 && c.b < 159))
+        //{
+        //  subcells[offset].isWater = true;
+        //  fov2x->setProperties(x, y, true, false);
+        //}
+        //
+        // Locate the pixels that are assigned to be sand (World)
+        //if((c.r >= 111 && c.r < 191) && (c.g >= 127 && c.g < 191) && (c.b == 159))
+        //{
+        //  fov2x->setProperties(x, y, true, false);
+        //}
+
+        ///*** These are based on the colours for the complexplanet example code using libnoise-0.9.0 ***///
+
+        // Locate the pixels that are assigned to be the deep ocean (World)
+        if((c.r >= 0 && c.r < 6) && (c.g >= 0 && c.g < 58) && (c.b >= 0 && c.b < 127))
+        {
+          subcells[offset].isWater = true;
+          fov2x->setProperties(x, y, true, false);
+        }
+
+        // Locate the pixels that are assigned to be the mid-depth ocean (World)
+        if((c.r >= 6 && c.r < 14) && (c.g >= 58 && c.g < 112) && (c.b >= 127 && c.b < 192))
+        {
+          subcells[offset].isWater = true;
+          fov2x->setProperties(x, y, true, false);
+        }
+
+        // Locate the pixels that are assigned to be the shallow ocean (World)
+        if((c.r >= 14 && c.r < 70) && (c.g >= 112 && c.g < 120) && (c.b >= 60 && c.b < 192))
+        {
+          subcells[offset].isWater = true;
+          fov2x->setProperties(x, y, true, false);
+        }
+
+        // Locate the pixels that are assigned to be moutain (World)
+        if((c.r >= 60 && c.r <= 255) && (c.g >= 60 && c.g <= 255) && (c.b >= 40 && c.b <= 255))
+        {
+          fov2x->setProperties(x, y, true, false);
+        }
+      }
+    }
+
+    // Set walk and transparent information in the normal resolution map
+    for(int x = 0; x < IMAGE_WIDTH; x++)
+    {
+      for(int y = 0; y < IMAGE_HEIGHT; y++)
+      {
+        bool trans = true, walk = true;
+        if(!isFov2xTransparent(2*x    , 2*y    )) trans = false;
+        if(!isFov2xTransparent(2*x + 1, 2*y    )) trans = false;
+        if(!isFov2xTransparent(2*x    , 2*y + 1)) trans = false;
+        if(!isFov2xTransparent(2*x + 1, 2*y + 1)) trans = false;
+        if(!isFov2xWalkable(2*x    , 2*y    )) walk = false;
+        if(!isFov2xWalkable(2*x + 1, 2*y    )) walk = false;
+        if(!isFov2xWalkable(2*x    , 2*y + 1)) walk = false;
+        if(!isFov2xWalkable(2*x + 1, 2*y + 1)) walk = false;
+        fov1x->setProperties(x, y, trans, walk);
+      }
+    }
+
     // Assign the location of all the places on the world map
     if(init)
     {
       nlocations = NWORLD;
       nnpcs = 0;
-      for(int i = 0; i < nlocations; i++)
-      {
-        addLocation(locWorld[i].x, locWorld[i].y, locWorld[i].name, locWorld[i].colour, locWorld[i].sym);
-      }
+      addWorldMapLocations();
     }
     displayWeather = true;
   }
   else
   {
+
+    // Cycle through all the map's cells
+    for(int x = 0; x < IMAGE_WIDTH2; x++)
+    {
+      for(int y = 0; y < IMAGE_HEIGHT2; y++)
+      {
+        // Assign colours according to it
+        offset = x + IMAGE_WIDTH2*y;
+        TCODColor c = img->getPixel(x, y);
+        subcells[offset].baseColour = c;
+        subcells[offset].isWater = false;
+        fov2x->setProperties(x, y, true, true);
+
+        ///*** These are based on my colours for the world map ***///
+
+        // Locate the pixels that are assigned to be water (Towns/Temples)
+        if((c.r >= 47 && c.r < 111) && (c.g >= 47 && c.g < 127) && (c.b >= 64 && c.b < 159))
+        {
+          subcells[offset].isWater = true;
+          fov2x->setProperties(x, y, true, false);
+        }
+        
+        // Locate the pixels that are assigned to be sand (Towns/Temples)
+        if((c.r >= 111 && c.r < 191) && (c.g >= 127 && c.g < 191) && (c.b == 159))
+        {
+          fov2x->setProperties(x, y, true, false);
+        }
+
+        // Locate the pixels that are assigned to be a flagstones (Towns/Temples)
+        if(c.r == c.g && c.g == c.b && c.b == c.r)
+        {
+          fov2x->setProperties(x, y, true, true);
+        }
+
+        // Locate the pixels that are assigned to be a wall (Towns/Temples)
+        if(c.r == 95 && c.g == 95 && c.b == 95)
+        {
+          fov2x->setProperties(x, y, true, false);
+        }
+      }
+    }
+
+    // Set walk and transparent information in the normal resolution map
+    for(int x = 0; x < IMAGE_WIDTH; x++)
+    {
+      for(int y = 0; y < IMAGE_HEIGHT; y++)
+      {
+        bool trans = true, walk = true;
+        if(!isFov2xTransparent(2*x    , 2*y    )) trans = false;
+        if(!isFov2xTransparent(2*x + 1, 2*y    )) trans = false;
+        if(!isFov2xTransparent(2*x    , 2*y + 1)) trans = false;
+        if(!isFov2xTransparent(2*x + 1, 2*y + 1)) trans = false;
+        if(!isFov2xWalkable(2*x    , 2*y    )) walk = false;
+        if(!isFov2xWalkable(2*x + 1, 2*y    )) walk = false;
+        if(!isFov2xWalkable(2*x    , 2*y + 1)) walk = false;
+        if(!isFov2xWalkable(2*x + 1, 2*y + 1)) walk = false;
+        fov1x->setProperties(x, y, trans, walk);
+      }
+    }
+
     // Assign Npcs to the appropriate towns and temples
     if(init)
     {
@@ -420,7 +470,7 @@ void WorldMap::loadMap(const char filename[], const char name[], int musicIndex,
         nnpcs = 1;
         addNpc(IMAGE_WIDTH/2, IMAGE_HEIGHT/2, 6, NPCTYPE_EARTHGUARDIAN);
       }
-      else if(id >= TOWN_01 && id <= TOWN_07)
+      else if(id >= TOWN_01 && id <= TOWN_12)
       {
         nlocations = 1;
         addLocation(IMAGE_WIDTH/2, IMAGE_HEIGHT/2, "Town Centre", TCODColor::gold, ' ');
@@ -460,6 +510,64 @@ void WorldMap::loadMap(const char filename[], const char name[], int musicIndex,
   }
   //img->save("data/img/worldmap.png");
   //img_thumb->save("data/img/worldmap_thumb.png");
+}
+
+void WorldMap::moveDisplay(int x, int y)
+{
+  // New display coordinates (top-left corner of the screen relative to the map)
+  // Coordinates so that the target is at the center of the screen
+  int cx = x - DISPLAY_WIDTH/2;
+  int cy = y - DISPLAY_HEIGHT/2;
+
+  // Make sure the DISPLAY doesn't see outside the map
+  if(cx < 0) cx = 0;
+  if(cy < 0) cy = 0;
+  if(cx > MAP_WIDTH - DISPLAY_WIDTH - 1) cx = MAP_WIDTH - DISPLAY_WIDTH - 1;
+  if(cy > MAP_HEIGHT - DISPLAY_HEIGHT - 1) cy = MAP_HEIGHT - DISPLAY_HEIGHT - 1;
+
+  display_x = cx; display_y = cy;
+}
+
+// Add all locations to the world map
+void WorldMap::addWorldMapLocations()
+{
+  // The explicit construction of the world map locations
+  locWorld.insert(make_pair(TEMPLE_LIGHT, Location( 56,  37, "Light Temple",  TCODColor::lighterYellow, CHAR_TEMPLE)));
+  locWorld.insert(make_pair(TEMPLE_FIRE,  Location(111,  14, "Fire Temple",   TCODColor::red,           CHAR_TEMPLE)));
+  locWorld.insert(make_pair(TEMPLE_WATER, Location(109,  56, "Water Temple",  TCODColor::blue,          CHAR_TEMPLE)));
+  locWorld.insert(make_pair(TEMPLE_WIND,  Location(  8,   9, "Wind Temple",   TCODColor::yellow,        CHAR_TEMPLE)));
+  locWorld.insert(make_pair(TEMPLE_EARTH, Location(  7,  48, "Earth Temple",  TCODColor::green,         CHAR_TEMPLE)));
+  locWorld.insert(make_pair(TOWN_01,      Location( 44,  15, "Rivendell",     TCODColor::white,         CHAR_TOWN)));
+  locWorld.insert(make_pair(TOWN_02,      Location(  9,  16, "Edoras",        TCODColor::white,         CHAR_TOWN)));
+  locWorld.insert(make_pair(TOWN_03,      Location( 38,  20, "Erebor",        TCODColor::white,         CHAR_TOWN)));
+  locWorld.insert(make_pair(TOWN_04,      Location( 65,  54, "Dol Amroth",    TCODColor::white,         CHAR_TOWN)));
+  locWorld.insert(make_pair(TOWN_05,      Location( 11,  55, "Khazad-dum",    TCODColor::white,         CHAR_TOWN)));
+  locWorld.insert(make_pair(TOWN_06,      Location( 95,  41, "Isengard",      TCODColor::white,         CHAR_TOWN)));
+  locWorld.insert(make_pair(TOWN_07,      Location( 97,  15, "Minas Tirith",  TCODColor::white,         CHAR_TOWN)));
+  locWorld.insert(make_pair(TOWN_08,      Location( 80,  32, "Osgilliath",    TCODColor::white,         CHAR_TOWN)));
+  locWorld.insert(make_pair(TOWN_09,      Location( 91,  12, "Minas Morgul",  TCODColor::white,         CHAR_TOWN)));
+  locWorld.insert(make_pair(TOWN_10,      Location( 36,  48, "Cirith Ungol",  TCODColor::white,         CHAR_TOWN)));
+  locWorld.insert(make_pair(TOWN_11,      Location( 17,  41, "Barad-dur",     TCODColor::white,         CHAR_TOWN)));
+  locWorld.insert(make_pair(TOWN_12,      Location( 23,  28, "Amon Amarth",   TCODColor::white,         CHAR_TOWN)));
+  locWorld.insert(make_pair(CAVE_01,      Location( 43,  42, "Cave Entrance", TCODColor::white,         CHAR_CAVE)));
+  locWorld.insert(make_pair(CAVE_02,      Location( 89,  51, "Cave Entrance", TCODColor::white,         CHAR_CAVE)));
+  locWorld.insert(make_pair(CAVE_03,      Location( 46,  47, "Cave Entrance", TCODColor::white,         CHAR_CAVE)));
+  locWorld.insert(make_pair(CAVE_04,      Location( 43,  58, "Cave Entrance", TCODColor::white,         CHAR_CAVE)));
+  locWorld.insert(make_pair(CAVE_05,      Location( 42,  26, "Cave Entrance", TCODColor::white,         CHAR_CAVE)));
+  locWorld.insert(make_pair(CAVE_06,      Location( 39,  30, "Cave Entrance", TCODColor::white,         CHAR_CAVE)));
+  locWorld.insert(make_pair(CAVE_07,      Location( 83,  47, "Cave Entrance", TCODColor::white,         CHAR_CAVE)));
+
+  for(int i = 0; i < nlocations; i++)
+  {
+    if(!locations[i].inUse)
+    {
+      locations[i] = locWorld[i];
+      locations[i].inUse = true;
+      cells[locWorld[i].x + IMAGE_WIDTH*locWorld[i].y].locationID = i;
+    }
+  }
+
+  locWorld.clear();
 }
 
 // Add a location to the map
@@ -505,6 +613,11 @@ CaveMap::CaveMap(): nitems(0), ncreatures(0), ncorpses(0), nlocations(0), upx(-1
   // FOV Maps
   fov1x = new TCODMap(MAP_WIDTH, MAP_HEIGHT);
   fov2x = new TCODMap(MAP_WIDTH2, MAP_HEIGHT2);
+
+  darkWall = TCODColor::darkestGrey;
+  lightWall = TCODColor(130,110,50);
+  darkGround = TCODColor::darkerGrey;
+  lightGround = TCODColor(200,180,50);
 
   // Image and thumbnail
   img = new TCODImage(MAP_WIDTH2, MAP_HEIGHT2);
@@ -840,15 +953,15 @@ void CaveMap::finalizeMap(int level)
   int nWalkable, px, py;
   float fWalkable = 0.0f;
 
-  if(level < NCAVES - 1)
+  if(level < NCAVE_REGIONS - 1)
   {
-    nitems = 4 + static_cast<int>((NITEMMAX - 4)*(static_cast<float>(level)/static_cast<float>(NCAVES - 1)));
-    ncreatures = 16 + static_cast<int>((NCREATUREMAX - 16)*(static_cast<float>(level)/static_cast<float>(NCAVES - 1)));
+    nitems = 4 + static_cast<int>((NITEMMAX - 4)*(static_cast<float>(level)/static_cast<float>(NCAVE_REGIONS - 1)));
+    ncreatures = 16 + static_cast<int>((NCREATUREMAX - 16)*(static_cast<float>(level)/static_cast<float>(NCAVE_REGIONS - 1)));
     ncorpses = nhides = NCORPSEMAX;
     nlocations = 2;
 
     sprintf(label, "Cave Depth %d", level + 1);
-    if(level % NLEVELS == 0) caveRegion++;
+    if(level % NLEVELS_REGION == 0) caveRegion++;
     switch(caveRegion)
     {
       case 1: musicID = SOUND_CAVE_MOOD_01; break;

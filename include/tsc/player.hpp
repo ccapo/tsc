@@ -61,9 +61,13 @@ class Player
   int xp, xpnext;                // Experience Points, Experience Points for Next Level
   int x, y;                // Player Position
   TCODColor colour;              // Player Colour
-  char sym;                // Player Symbol
+  int sym;                // Player Symbol
+  int sym_up;                // Player Symbol
+  int sym_down;                // Player Symbol
+  int sym_left;                // Player Symbol
+  int sym_right;                // Player Symbol
   int gp;                  // Player Gold Points
-  float walkTimer;              // Player's Walk Timer
+  int walkWait;              // Player's Walk Wait
   float magicTimer;              // Player's Magic Timer
   float hitFlashTimer;              // Player's Hit Flash Timer
   TCODPath *path;                // Player's path object

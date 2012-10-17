@@ -51,25 +51,27 @@
 #include "main.hpp"
 
 // The default creature constructor
-Creature::Creature(): lvl(1), x(0), y(0), creatureType(CREATURETYPE_INSECT), colour(TCODColor::yellow), sym('i'), walkTimer(1.0f), inUse(false)
+Creature::Creature(): lvl(1), x(0), y(0), creatureType(CREATURETYPE_INSECT), colour(TCODColor::white), walkWait(0), scentThreshold(0.0f), inUse(false)
 {
-  sprintf(name, "%s", "Yellow Insect");
+  sprintf(name, "%s", "Green Spider");
+  sym = CHAR_SPIDER_GREEN;
   //path = NULL;
 }
 
 // The creature constructor
-Creature::Creature(int x0, int y0, ECreatureType creatureType0): x(x0), y(y0), creatureType(creatureType0), walkTimer(1.0f), inUse(true)
+Creature::Creature(int x0, int y0, ECreatureType creatureType0): x(x0), y(y0), creatureType(creatureType0), colour(TCODColor::white), walkWait(0), inUse(true)
 {
   switch(creatureType)
   {
     case CREATURETYPE_INSECT:
     {
-      sprintf(name, "%s", "Yellow Insect");           // Name
+      sprintf(name, "%s", "Green Spider");            // Name
       lvl = 1;                                        // Level
       stats.hpmax = 5; stats.mpmax = 0;               // Max. HP, Max. MP
       stats.hp = stats.hpmax; stats.mp = stats.mpmax; // HP, MP
       stats.spd = 4;                                  // SPD
-      colour = TCODColor::yellow; sym = 'i';          // Colour, Symbol
+      scentThreshold = 0.5f;                          // Scent Threshold
+      sym = CHAR_SPIDER_GREEN;                        // Symbol
       break;
     }
     case CREATURETYPE_VERMIN:
@@ -79,57 +81,63 @@ Creature::Creature(int x0, int y0, ECreatureType creatureType0): x(x0), y(y0), c
       stats.hpmax = 10; stats.mpmax = 0;              // Max. HP, Max. MP
       stats.hp = stats.hpmax; stats.mp = stats.mpmax; // HP, MP
       stats.spd = 4;                                  // SPD
-      colour = TCODColor::lightestSepia; sym = 'v';   // Colour, Symbol
+      scentThreshold = 0.5f;                          // Scent Threshold
+      sym = CHAR_VERMIN_BROWN;                        // Symbol
       break;
     }
     case CREATURETYPE_REPTILE:
     {
-      sprintf(name, "%s", "Green Lizard");            // Name
+      sprintf(name, "%s", "Blue Imp");                // Name
       lvl = 1;                                        // Level
       stats.hpmax = 15; stats.mpmax = 0;              // Max. HP, Max. MP
       stats.hp = stats.hpmax; stats.mp = stats.mpmax; // HP, MP
       stats.spd = 4;                                  // SPD
-      colour = TCODColor::green; sym = 'L';           // Colour, Symbol
+      scentThreshold = 0.5f;                          // Scent Threshold
+      sym = CHAR_IMP_BLUE;                            // Symbol
       break;
     }
     case CREATURETYPE_BEAST:
     {
-      sprintf(name, "%s", "Blue Beast");              // Name
+      sprintf(name, "%s", "Goblin Warrior");          // Name
       lvl = 2;                                        // Level
       stats.hpmax = 20; stats.mpmax = 0;              // Max. HP, Max. MP
       stats.hp = stats.hpmax; stats.mp = stats.mpmax; // HP, MP
       stats.spd = 8;                                  // SPD
-      colour = TCODColor::blue; sym = 'B';            // Colour, Symbol
+      scentThreshold = 0.5f;                          // Scent Threshold
+      sym = CHAR_GOBLIN_WARRIOR;                      // Symbol
       break;
     }
     case CREATURETYPE_TROGLODYTE:
     {
-      sprintf(name, "%s", "Green Troglodyte");        // Name
+      sprintf(name, "%s", "Orc Hero");                // Name
       lvl = 5;                                        // Level
       stats.hpmax = 30; stats.mpmax = 0;              // Max. HP, Max. MP
       stats.hp = stats.hpmax; stats.mp = stats.mpmax; // HP, MP
       stats.spd = 6;                                  // SPD
-      colour = TCODColor::darkGreen; sym = 'T';       // Colour, Symbol
+      scentThreshold = 0.5f;                          // Scent Threshold
+      sym = CHAR_ORC_HERO;                            // Symbol
       break;
     }
     case CREATURETYPE_GIANT:
     {
-      sprintf(name, "%s", "Orange Giant");            // Name
+      sprintf(name, "%s", "Brown Golem");             // Name
       lvl = 10;                                       // Level
       stats.hpmax = 50; stats.mpmax = 0;              // Max. HP, Max. MP
       stats.hp = stats.hpmax; stats.mp = stats.mpmax; // HP, MP
       stats.spd = 4;                                  // SPD
-      colour = TCODColor::orange; sym = 'G';          // Colour, Symbol
+      scentThreshold = 0.5f;                          // Scent Threshold
+      sym = CHAR_GOLEM_BROWN;                         // Symbol
       break;
     }
     case CREATURETYPE_SPECIAL:
     {
-      sprintf(name, "%s", "Hunter-Seeker");           // Name
+      sprintf(name, "%s", "Demon Mage");              // Name
       lvl = 15;                                       // Level
       stats.hpmax = 65; stats.mpmax = 10;             // Max. HP, Max. MP
       stats.hp = stats.hpmax; stats.mp = stats.mpmax; // HP, MP
       stats.spd = 10;                                 // SPD
-      colour = TCODColor::red; sym = 'H';             // Colour, Symbol
+      scentThreshold = 0.5f;                          // Scent Threshold
+      sym = CHAR_DEMON_MAGE;                          // Symbol
       break;
     }
     default: break;
@@ -244,13 +252,13 @@ void Creature::update(Player player, float elapsed)
 
   if(inUse)
   {
-    // Increment walk timer
-    walkTimer += elapsed;
-
-    if(walkTimer*static_cast<float>(stats.spd) >= 1.0f)
+    if(walkWait > 0)
     {
-      walkTimer = 0.0f;
-
+      // Decrement the walk wait
+      walkWait -= 1;
+    }
+    else
+    {
       switch(creatureType)
       {
         case CREATURETYPE_INSECT:
@@ -263,7 +271,6 @@ void Creature::update(Player player, float elapsed)
         {
           // Avoid the player's scent
           avoidPlayer(cmap, player);
-
           break;
         }
         case CREATURETYPE_REPTILE:
@@ -314,6 +321,9 @@ void Creature::update(Player player, float elapsed)
         }
         default: break;
       }
+
+      // Reset walk wait
+      walkWait = SPDMAX + SPDMIN - stats.spd;
     }
   }
 }
@@ -349,10 +359,10 @@ void Creature::render(Player player)
 }
 
 // The default corpse constructor
-Corpse::Corpse(): x(0), y(0), colour(TCODColor::lightGrey), sym('%'), inUse(false) {}
+Corpse::Corpse(): x(0), y(0), colour(TCODColor::lightGrey), sym(CHAR_SKULL), inUse(false) {}
 
 // The corpse constructor
-Corpse::Corpse(int x0, int y0): x(x0), y(y0), colour(TCODColor::lightGrey), sym('%'), inUse(true) {}
+Corpse::Corpse(int x0, int y0): x(x0), y(y0), colour(TCODColor::lightGrey), sym(CHAR_SKULL), inUse(true) {}
 
 // Render Corpse
 void Corpse::render(Player player)
@@ -385,10 +395,10 @@ void Corpse::render(Player player)
 }
 
 // The default hide constructor
-Hide::Hide(): x(0), y(0), creatureType(CREATURETYPE_INSECT), colour(TCODColor::lightRed), sym('%'), mass(0.0f), inUse(false) {}
+Hide::Hide(): x(0), y(0), creatureType(CREATURETYPE_INSECT), colour(TCODColor::lightRed), sym(CHAR_SKULL), mass(0.0f), inUse(false) {}
 
 // The hide constructor
-Hide::Hide(int x0, int y0, ECreatureType creatureType0): x(x0), y(y0), creatureType(creatureType0), colour(TCODColor::lightRed), sym('%'), inUse(true)
+Hide::Hide(int x0, int y0, ECreatureType creatureType0): x(x0), y(y0), creatureType(creatureType0), colour(TCODColor::lightRed), sym(CHAR_SKULL), inUse(true)
 {
   switch(creatureType)
   {
@@ -501,14 +511,14 @@ HideInventory::HideInventory(void)
 }
 
 // The default Npc constructor
-Npc::Npc(): x(0), y(0), spd(3), npcType(NPCTYPE_TOWNSPERSON), colour(TCODColor::lightSepia), sym('@'), walkTimer(1.0f), inUse(false)
+Npc::Npc(): x(0), y(0), spd(3), npcType(NPCTYPE_TOWNSPERSON), colour(TCODColor::lightSepia), walkWait(1.0f), inUse(false)
 {
   sprintf(label, "%s", "Townsperson");
   path = NULL;
 }
 
 // The Npc constructor
-Npc::Npc(int x0, int y0, int spd0, ENpcType npcType0): x(x0), y(y0), spd(spd0), npcType(npcType0), sym('@'), walkTimer(1.0f), inUse(true)
+Npc::Npc(int x0, int y0, int spd0, ENpcType npcType0): x(x0), y(y0), spd(spd0), npcType(npcType0), walkWait(1.0f), inUse(true)
 {
   switch(npcType)
   {
@@ -516,61 +526,71 @@ Npc::Npc(int x0, int y0, int spd0, ENpcType npcType0): x(x0), y(y0), spd(spd0), 
     {
       sprintf(label, "%s", "Guardian of Light");
       colour = TCODColor::lighterYellow;
+      sym = CHAR_GUARDIAN;
       break;
     }
     case NPCTYPE_FIREGUARDIAN:
     {
       sprintf(label, "%s", "Guardian of Fire");
       colour = TCODColor::red;
+      sym = CHAR_GUARDIAN;
       break;
     }
     case NPCTYPE_WATERGUARDIAN:
     {
       sprintf(label, "%s", "Guardian of Water");
       colour = TCODColor::blue;
+      sym = CHAR_GUARDIAN;
       break;
     }
     case NPCTYPE_WINDGUARDIAN:
     {
       sprintf(label, "%s", "Guardian of Wind");
       colour = TCODColor::yellow;
+      sym = CHAR_GUARDIAN;
       break;
     }
     case NPCTYPE_EARTHGUARDIAN:
     {
       sprintf(label, "%s", "Guardian of Earth");
       colour = TCODColor::green;
+      sym = CHAR_GUARDIAN;
       break;
     }
     case NPCTYPE_ITEMSHOPKEEPER:
     {
       sprintf(label, "%s", "Item Shopkeeper");
-      colour = TCODColor::lightBlue;
+      colour = TCODColor::white;
+      sym = CHAR_KEEPER;
       break;
     }
     case NPCTYPE_EQUIPSHOPKEEPER:
     {
       sprintf(label, "%s", "Equipment Shopkeeper");
-      colour = TCODColor::lightBlue;
+      colour = TCODColor::white;
+      sym = CHAR_KEEPER;
       break;
     }
     case NPCTYPE_INNKEEPER:
     {
       sprintf(label, "%s", "Innkeeper");
-      colour = TCODColor::lightYellow;
+      colour = TCODColor::white;
+      sym = CHAR_KEEPER;
       break;
     }
     case NPCTYPE_FERRYMAN:
     {
       sprintf(label, "%s", "Ferryman");
-      colour = TCODColor::darkerSepia;
+      colour = TCODColor::white;
+      sym = CHAR_KEEPER;
       break;
     }
     case NPCTYPE_TOWNSPERSON:
     {
       //sprintf(label, "%s", "Townsperson");
       sprintf(label, "%s", NameGenerator::generateFantasyName(game.rng, game.rng->getInt(0, 1) == 0));
-      colour = TCODColor::darkSepia;
+      colour = TCODColor::white;
+      sym = CHAR_PERSON;
       break;
     }
     default: break;
@@ -587,12 +607,12 @@ void Npc::update(Player player, float elapsed)
   {
     if(IN_RECTANGLE(x, y + 3, DISPLAY_WIDTH, DISPLAY_HEIGHT))
     {
-      // Increment walk timer
-      walkTimer += elapsed;
+      // Increment walk Wait
+      walkWait += elapsed;
 
-      if(walkTimer*static_cast<float>(spd) >= 1.0f)
+      if(walkWait*static_cast<float>(spd) >= 1.0f)
       {
-        walkTimer = 0.0f;
+        walkWait = 0.0f;
 
         if(path)
         {
@@ -615,7 +635,7 @@ void Npc::update(Player player, float elapsed)
           {
             delete path;
             path = NULL;
-            walkTimer = -12.0f*elapsed;
+            walkWait = -12.0f*elapsed;
           }
         }
         else

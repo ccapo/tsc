@@ -68,7 +68,7 @@ const char *statusName[NSTATUS] = {
 Stats::Stats(): hpmax(HPMIN), hp(HPMIN), ap(APMIN), dp(DPMIN), str(STRMIN), spd(SPDMIN), mpmax(MPMIN), mp(MPMIN), map(MAPMIN), mdp(MDPMIN), wil(WILMIN), acu(ACUMIN) {}
 
 // The Compound Assignment Operator
-Stats::Stats &Stats::operator+= (const Stats &rhs)
+Stats &Stats::operator+= (const Stats &rhs)
 {
   // Do the compound assignment work
   //this->hpmax += rhs.hpmax;
@@ -88,7 +88,7 @@ Stats::Stats &Stats::operator+= (const Stats &rhs)
 }
 
 // The Compound Assignment Operator
-Stats::Stats &Stats::operator-= (const Stats &rhs)
+Stats &Stats::operator-= (const Stats &rhs)
 {
   // Do the compound assignment work
   //this->hpmax -= rhs.hpmax;

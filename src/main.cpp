@@ -54,11 +54,14 @@ int main(int narg, char *argv[])
 {
   bool startGame = false, newGame = false;
   bool firstFade = false, endGame = false;
-  TCOD_key_t key = TCODConsole::checkForKeypress(TCOD_KEY_PRESSED);
-  TCOD_mouse_t mouse = TCODMouse::getStatus();
+  TCOD_key_t key;
+  TCOD_mouse_t mouse;
+  TCOD_event_t event;
 
   // Startup Game
   game.startup(narg, argv);
+
+  event = TCODSystem::checkForEvent(TCOD_EVENT_KEY_PRESS, &key, &mouse);
 
   // Loop Title Screen
   while(!startGame && !TCODConsole::isWindowClosed())
@@ -73,12 +76,13 @@ int main(int narg, char *argv[])
     TCODConsole::root->flush();
 
     // Get keyboard and mouse input
-    key = TCODConsole::checkForKeypress();
+    event = TCODSystem::checkForEvent(TCOD_EVENT_KEY_PRESS, &key, &mouse);
   }
 
   // Loop Introdution Screen (New Games Only)
   newGame = (game.menu.selection == MAIN_NEW);
   firstFade = !newGame;
+  game.menu.inGame = true;
   while(newGame)
   {
     // Update the game
@@ -91,7 +95,7 @@ int main(int narg, char *argv[])
     TCODConsole::root->flush();
 
     // Get keyboard and mouse input
-    key = TCODConsole::checkForKeypress();
+    event = TCODSystem::checkForEvent(TCOD_EVENT_KEY_PRESS, &key, &mouse);
   }
 
   // Loop Game
@@ -107,8 +111,7 @@ int main(int narg, char *argv[])
     TCODConsole::root->flush();
 
     // Get keyboard and mouse input
-    key = TCODConsole::checkForKeypress(TCOD_KEY_PRESSED);
-    mouse = TCODMouse::getStatus();
+    event = TCODSystem::checkForEvent(TCOD_EVENT_KEY_PRESS | TCOD_EVENT_MOUSE, &key, &mouse);
   }
 
   // Shutdown Game

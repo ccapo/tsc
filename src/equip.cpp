@@ -79,7 +79,7 @@ Equip::Equip(const char name0[], const char label0[], const char desc0[],
 }
 
 // The Assignment Operator
-Equip::Equip &Equip::operator= (const Equip &rhs)
+Equip &Equip::operator= (const Equip &rhs)
 {
   // Do the assignment work
   sprintf(this->name, "%s", rhs.name);       // Name
@@ -185,7 +185,7 @@ EquipInventory::EquipInventory()
         0, 0,                     // WIL, ACU
         15.0f, 1000);             // MASS, GP
   Weapons[NO_SWORD] = Equip(
-        "%cEmpty             %c", // Name
+        "%cNone              %c", // Name
         "%cWeapon   %c :: ",      // Label
         "",                       // Description
         0,                        // HPMAX
@@ -286,7 +286,7 @@ EquipInventory::EquipInventory()
         0, 0,                     // WIL, ACU
         18.0f, 1500);             // MASS, GP
   Shields[NO_SHIELD] = Equip(
-        "%cEmpty             %c", // Name
+        "%cNone              %c", // Name
         "%cShield   %c :: ",      // Label
         "",                       // Description
         0,                        // HPMAX
@@ -388,7 +388,7 @@ EquipInventory::EquipInventory()
         0, 0,                     // WIL, ACU
         30.0f, 2500);             // MASS, GP
   Armours[NO_ARMOUR] = Equip(
-        "%cEmpty             %c", // Name
+        "%cNone              %c", // Name
         "%cArmour   %c :: ",      // Label
         "",                       // Description
         0,                        // HPMAX
@@ -489,7 +489,7 @@ EquipInventory::EquipInventory()
         0, 2,                     // WIL, ACU
         0.1f, 100);               // MASS, GP
   Accessory[NO_ACCESSORY] = Equip(
-        "%cEmpty             %c", // Name
+        "%cNone              %c", // Name
         "%cAccessory%c :: ",      // Label
         "",                       // Description
         0,                        // HPMAX

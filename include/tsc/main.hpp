@@ -54,6 +54,9 @@
 #include <math.h>
 #include <time.h>
 #include <string.h>
+#include <iostream>
+#include <map>
+#include <utility>
 #include "libtcod.hpp"
 #include "fmod.h"    // FMODEX <= Consider replacing with C++ version
 #include "fmod_errors.h"  // FMODEX Error codes

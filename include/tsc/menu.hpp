@@ -126,6 +126,7 @@ class Menu
   bool displayInnMenu;        // Switch to display Inn Menu
   bool displayFerryMenu;        // Switch to display Ferry Menu
   bool displayDeathMsg;        // Switch to display Death Message
+  bool inGame;                  // Switch when in Game
 
   TCODImage *bg_img;        // Background image for main menu
 

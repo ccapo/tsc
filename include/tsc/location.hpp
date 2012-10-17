@@ -56,7 +56,7 @@ struct Location
   int x, y;                  // Location Position
   char name[CHARMAX];                // Location Name
   TCODColor colour;                // Location Colour
-  char sym;                  // Location Symbol
+  int sym;                  // Location Symbol
   bool inUse;                  // Location In Use flag
 
   ItemInventory itemInv;                // Item Inventory
@@ -64,6 +64,6 @@ struct Location
   HideInventory hideInv;                // Hide Inventory
 
   Location();                  // The Default Location Constructor
-  Location(int x0, int y0, const char name0[], TCODColor colour0, char sym0);  // The Location Constructor
+  Location(int x0, int y0, const char name0[], TCODColor colour0, int sym0);  // The Location Constructor
   void render();                  // Render Location
 };

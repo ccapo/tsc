@@ -57,7 +57,7 @@ Location::Location(): x(0), y(0), colour(TCODColor::white), sym(TCOD_CHAR_RADIO_
 }
 
 // The Location Constructor
-Location::Location(int x0, int y0, const char name0[], TCODColor colour0, char sym0): x(x0), y(y0), colour(colour0), sym(sym0), inUse(true)
+Location::Location(int x0, int y0, const char name0[], TCODColor colour0, int sym0): x(x0), y(y0), colour(colour0), sym(sym0), inUse(true)
 {
   sprintf(name, "%s", name0);
 }

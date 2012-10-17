@@ -68,7 +68,18 @@ Game::Game(): inCaves(false), isFaded(false), worldID(0), caveID(0), magicID(0),
   terrain = new TCODNoise(2, rng);
   weather = new TCODNoise(3, rng);
 
-  player.x = IMAGE_WIDTH/2; player.y = IMAGE_HEIGHT/2 + 1;
+  p = 0.5f;
+  printf("Before: %f\n", p);
+  offsetW = 0.5f*(1.0f + torch->get(&p)); //0.18f;
+  printf("After #1: %f\n", p);
+  p += 0.5f;
+  printf("After #2: %f\n", p);
+  offsetC = 0.5f*(1.0f + torch->get(&p)); //0.23f;
+  printf("After #3: %f\n", p);
+  printf("%f %f\n", offsetW, offsetC);
+
+  player.x = IMAGE_WIDTH/2;
+  player.y = IMAGE_HEIGHT/2 + 1;
 
 //  guardian = NULL;
 //  boss = NULL;
@@ -99,10 +110,10 @@ Game::~Game()
 void Game::startup(int narg, char *argv[])
 {
   const char fonts[NFONTS][CHARMAX] = {"data/fonts/arial4x4.png",
-                                       "data/fonts/arial6x6.png",
-                                       "data/fonts/arial8x8.png"};
+                                       "data/fonts/arial8x8.png",
+                                       "data/fonts/arial16x16.png"};
   int fontFlags = TCOD_FONT_LAYOUT_TCOD | TCOD_FONT_TYPE_GREYSCALE;
-  int iFont = 2, nCol = 32, nRow = 8, maxFps = 25;
+  int iFont = 1, nCol = 32, nRow = 13, maxFps = 24;
   int initialDelay = 100, interval = 10;
   bool fullscreen = false;
   TCOD_renderer_t renderer = TCOD_RENDERER_SDL;
@@ -123,8 +134,239 @@ void Game::startup(int narg, char *argv[])
   TCODSystem::setFps(maxFps);
 
   // Assign extra ascii keys
-  TCODConsole::mapAsciiCodeToFont(TCOD_CHAR_CHARGEBAR, 0, 5);
-  //TCODConsole::mapAsciiCodeToFont(TCOD_CHAR_CHARGEBAR, 26, 3);
+  int x = 0, y = 8;
+  TCODConsole::mapAsciiCodeToFont(CHAR_CHARGEBAR, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_PLAYER_RIGHT, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_PLAYER_DOWN, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_PLAYER_LEFT, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_PLAYER_UP, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_GUARDIAN, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_KEEPER, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_PERSON, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_GUARD_GREY, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_GUARD_RED, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_GUARD_GOLD, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_WARLOCK_PURPLE, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_WARLOCK_WHITE, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_WARLOCK_RED, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_NECROMANCER_APPENTICE, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_NECROMANCER_MASTER, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_DARKELF_ARCHER, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_DARKELF_WARRIOR, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_DARKELF_MAGE, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_DWARF_WARRIOR, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_DWARF_AXEBEARER, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_DWARF_MAGE, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_DWARF_HERO, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_UNDEAD_DWARF_WARRIOR, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_UNDEAD_DWARF_AXEBEARER, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_UNDEAD_DWARF_MAGE, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_UNDEAD_DWARF_HERO, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_GOBLIN_PEON, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_GOBLIN_WARRIOR, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_GOBLIN_MAGE, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_IMP_BLUE, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_IMP_RED, x++, y);
+  x = 0; y++;
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_ORGE_PEON_GREEN, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_ORGE_WARRIOR_GREEN, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_ORGE_PEON_RED, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_ORGE_WARRIOR_RED, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_SKELETON_PEON, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_SKELETON_WARRIOR, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_SKELETON_HERO, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_SKELETON_MAGE, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_SPRITE_RED, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_SPRITE_BLUE, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_SPRITE_GREEN, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_SPRITE_YELLOW, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_ORC_PEON, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_ORC_WARRIOR, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_ORC_HERO, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_ORC_MAGE, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_DEMON_PEON, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_DEMON_HERO, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_DEMON_MAGE, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_FLAYER_WARRIOR, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_FLAYER_MAGE, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_SKULL, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_GOLEM_GREY, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_GOLEM_BROWN, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_GOLEM_RED, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_SLIME_BROWN, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_SLIME_GREEN, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_EYEBALL, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_VERMIN_BROWN, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_VERMIN_GREEN, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_SNAKE_PURLE, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_SNAKE_GREEN, x++, y);
+  x = 0; y++;
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_SCORPIAN_YELLOW, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_SCORPIAN_BLACK, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_SPIDER_BLACK, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_SPIDER_RED, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_SPIDER_GREEN, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_PYTHON_RED, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_PYTHON_BROWN, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_PYTHON_YELLOW, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_BAT_BROWN, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_BAT_BLUE, x++, y);
+
+  // Environment Tiles
+  TCODConsole::mapAsciiCodeToFont(CHAR_TREE_A, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_TREE_B, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_TREE_C, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_TREE_D, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_TREE_E, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_TREE_F, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_TREE_G, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_SHRUB_A, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_SHRUB_B, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_SHRUB_C, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_SHRUB_D, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_MUSHROOM, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_FLOWERS_WHITE, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_FLOWERS_BLUE, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_TEMPLE, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_TOWN, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_CAVE, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_BED, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_TABLE, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_BOOKCASE, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_CHAIR_RIGHT, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_CHAIR_LEFT, x++, y);
+  x = 0; y++;
+
+  // Minor Bosses (Upper Portion)
+  TCODConsole::mapAsciiCodeToFont(CHAR_DEMONLORD_WHITE_UL, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_DEMONLORD_WHITE_UR, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_DEMONLORD_RED_UL, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_DEMONLORD_RED_UR, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_CYCLOPS_UL, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_CYCLOPS_UR, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_DRAGON_LARGE_RED_UL, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_DRAGON_LARGE_RED_UR, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_DRAGON_LARGE_YELLOW_UL, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_DRAGON_LARGE_YELLOW_UR, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_DRAGON_LARGE_GREEN_UL, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_DRAGON_LARGE_GREEN_UR, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_DRAGON_LARGE_BLUE_UL, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_DRAGON_LARGE_BLUE_UR, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_DRAGON_LARGE_GREY_UL, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_DRAGON_LARGE_GREY_UR, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_MINOTAUR_UL, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_MINOTAUR_UR, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_LIZARD_GIANT_UL, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_LIZARD_GIANT_UR, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_MEDUSA_UL, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_MEDUSA_UR, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_FLYING_BRAIN_UL, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_FLYING_BRAIN_UR, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_SLIMELORD_UL, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_SLIMELORD_UR, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_BEHOLDER_UL, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_BEHOLDER_UR, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_BEHEMOTH_UL, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_BEHEMOTH_UR, x++, y);
+
+  // Final Boss (Upper Portion)
+  TCODConsole::mapAsciiCodeToFont(CHAR_FINAL_BOSS_UL, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_FINAL_BOSS_UR, x++, y);
+  x = 0; y++;
+
+  // Minor Bosses (Lower Portion)
+  TCODConsole::mapAsciiCodeToFont(CHAR_DEMONLORD_WHITE_LL, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_DEMONLORD_WHITE_LR, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_DEMONLORD_RED_LL, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_DEMONLORD_RED_LR, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_CYCLOPS_LL, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_CYCLOPS_LR, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_DRAGON_LARGE_RED_LL, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_DRAGON_LARGE_RED_LR, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_DRAGON_LARGE_YELLOW_LL, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_DRAGON_LARGE_YELLOW_LR, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_DRAGON_LARGE_GREEN_LL, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_DRAGON_LARGE_GREEN_LR, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_DRAGON_LARGE_BLUE_LL, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_DRAGON_LARGE_BLUE_LR, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_DRAGON_LARGE_GREY_LL, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_DRAGON_LARGE_GREY_LR, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_MINOTAUR_LL, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_MINOTAUR_LR, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_LIZARD_GIANT_LL, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_LIZARD_GIANT_LR, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_MEDUSA_LL, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_MEDUSA_LR, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_FLYING_BRAIN_LL, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_FLYING_BRAIN_LR, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_SLIMELORD_LL, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_SLIMELORD_LR, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_BEHOLDER_LL, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_BEHOLDER_LR, x++, y);
+
+  TCODConsole::mapAsciiCodeToFont(CHAR_BEHEMOTH_LL, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_BEHEMOTH_LR, x++, y);
+
+  // Final Boss (Lower Portion)
+  TCODConsole::mapAsciiCodeToFont(CHAR_FINAL_BOSS_LL, x++, y);
+  TCODConsole::mapAsciiCodeToFont(CHAR_FINAL_BOSS_LR, x++, y);
 
   // Read seed value from the command line, if present
   if(narg == 2)
@@ -134,6 +376,11 @@ void Game::startup(int narg, char *argv[])
     torch = new TCODNoise(1, rng);
     terrain = new TCODNoise(2, rng);
     weather = new TCODNoise(3, rng);
+
+    p = 0.5f;
+    offsetW = 0.5f*(1.0f + torch->get(&p)); //0.18f;
+    p += 0.5f;
+    offsetC = 0.5f*(1.0f + torch->get(&p)); //0.23f;
   }
 
   // Startup FMODEX, and load all the music files
@@ -144,6 +391,10 @@ void Game::startup(int narg, char *argv[])
 
   // Clear root console
   TCODConsole::root->clear();
+
+  // Initialize Message Log
+  menu.msgcon = new TCODConsole(3*DISPLAY_WIDTH/4 - 2, NMSGS + 4);
+  menu.msgcon->printFrame(0, 0, 3*DISPLAY_WIDTH/4 - 2, NMSGS + 4, false, TCOD_BKGND_SET, "Message Log");
 
   // Play the music for the main menu
   sound.play(SOUND_MAIN_MENU);
@@ -383,6 +634,18 @@ void Game::renderIntro()
 bool Game::newGame()
 {
   bool status = true;
+  uint32 tstop, tstart = TCODSystem::getElapsedMilli();
+  int tsleep;
+
+  // Play the music for the current map
+  sound.play(SOUND_BUILD_MAP);
+
+  // Update the sound system
+  sound.endFrame();
+  sound.update();
+
+  sound.first = false;
+  sound.crossFading = true;
 
   // Initialize all maps
   float fraction = 0.0f;
@@ -391,7 +654,7 @@ bool Game::newGame()
   {
     if(worldID >= 1 && worldID < NTEMPLES + 1)
     {
-      world[worldID].loadMap("data/img/templemap.png", "Temple Map", SOUND_TOWN_MAP);
+      world[worldID].loadMap("data/img/templemap.png", "Temple Map", SOUND_TEMPLE_MAP);
     }
     else if(worldID >= NTEMPLES + 1 && worldID < NTEMPLES + NTOWNS + 1)
     {
@@ -402,7 +665,7 @@ bool Game::newGame()
       world[worldID].loadMap("data/img/worldmap.png", "World Map", SOUND_WORLD_MAP);
 
       // Generate random town names
-      for(int i = 5; i < world[worldID].nlocations - 1; i++)
+      for(int i = TOWN_01; i <= TOWN_12; i++)
       {
         sprintf(world[worldID].locations[i].name, "%s", NameGenerator::generateCityName(rng));
       }
@@ -410,15 +673,21 @@ bool Game::newGame()
       // Setup their economy
       setupEconomy();
     }
-    fraction = static_cast<float>(worldID)/static_cast<float>(NWORLD + NCAVES - 2);
+    fraction = static_cast<float>(worldID)/static_cast<float>(NWORLD + NCAVE_REGIONS*NLEVELS_REGION - 1);
     displayProgress("Generating Serpentine Caves", fraction);
+
+    // Crossfade between the two sound channels
+    if(sound.crossFading) sound.crossFade(TCODSystem::getLastFrameLength());
   }
 
-  for(caveID = 0; caveID < NCAVES; caveID++)
+  for(caveID = 0; caveID < NCAVE_REGIONS*NLEVELS_REGION; caveID++)
   {
     caves[caveID].finalizeMap(caveID);
-    fraction = static_cast<float>(caveID + NWORLD - 1)/static_cast<float>(NWORLD + NCAVES - 2);
+    fraction = static_cast<float>(caveID + NWORLD)/static_cast<float>(NWORLD + NCAVE_REGIONS*NLEVELS_REGION - 1);
     displayProgress("Generating Serpentine Caves", fraction);
+
+    // Crossfade between the two sound channels
+    if(sound.crossFading) sound.crossFade(TCODSystem::getLastFrameLength());
   }
   TCODConsole::root->setDefaultBackground(TCODColor::black);
 
@@ -431,6 +700,14 @@ bool Game::newGame()
   player.updateStatus();
 
   sound.first = true;
+
+  tstop = TCODSystem::getElapsedMilli();
+  tsleep = 29000 - (tstop - tstart);
+
+#ifndef NOSOUND
+  // Pause for the build music
+  if(tsleep > 0) TCODSystem::sleepMilli(tsleep);
+#endif
 
   // Fade out
   for(int fade = 255; fade >= 0; fade -= 25)
@@ -466,17 +743,17 @@ bool Game::saveGame(bool init)
     nb = sizeof(world[i]);
     zip->putInt(nb);
     zip->putData(nb, &world[i]);
-    fraction = static_cast<float>(i)/static_cast<float>(NWORLD + NCAVES);
+    fraction = static_cast<float>(i)/static_cast<float>(NWORLD + NCAVE_REGIONS*NLEVELS_REGION + 1);
     if(init) displayProgress("Saving Serpentine Caves", fraction);
   }
 
   // Store cave data
-  for(int i = 0; i < NCAVES; i++)
+  for(int i = 0; i < NCAVE_REGIONS*NLEVELS_REGION; i++)
   {
     nb = sizeof(caves[i]);
     zip->putInt(nb);
     zip->putData(nb, &caves[i]);
-    fraction = static_cast<float>(i + NWORLD - 1)/static_cast<float>(NWORLD + NCAVES);
+    fraction = static_cast<float>(i + NWORLD)/static_cast<float>(NWORLD + NCAVE_REGIONS*NLEVELS_REGION + 1);
     if(init) displayProgress("Saving Serpentine Caves", fraction);
   }
 
@@ -484,14 +761,14 @@ bool Game::saveGame(bool init)
   nb = sizeof(menu);
   zip->putInt(nb);
   zip->putData(nb, &menu);
-  fraction = static_cast<float>(NWORLD + NCAVES - 1)/static_cast<float>(NWORLD + NCAVES);
+  fraction = static_cast<float>(NWORLD + NCAVE_REGIONS*NLEVELS_REGION)/static_cast<float>(NWORLD + NCAVE_REGIONS*NLEVELS_REGION + 1);
   if(init) displayProgress("Saving Serpentine Caves", fraction);
 
   // Store player data
   nb = sizeof(player);
   zip->putInt(nb);
   zip->putData(nb, &player);
-  fraction = static_cast<float>(NWORLD + NCAVES)/static_cast<float>(NWORLD + NCAVES);
+  fraction = static_cast<float>(NWORLD + NCAVE_REGIONS*NLEVELS_REGION + 1)/static_cast<float>(NWORLD + NCAVE_REGIONS*NLEVELS_REGION + 1);
   if(init) displayProgress("Saving Serpentine Caves", fraction);
 
   // Write to save file
@@ -564,7 +841,7 @@ bool Game::loadGame()
 
     if(worldID >= 1 && worldID < NTEMPLES + 1)
     {
-      world[worldID].loadMap("data/img/templemap.png", "Temple Map", SOUND_TOWN_MAP, false);
+      world[worldID].loadMap("data/img/templemap.png", "Temple Map", SOUND_TEMPLE_MAP, false);
       for(int i = 0; i < world[worldID].nnpcs; i++) world[worldID].npcs[i].path = NULL;
     }
     else if(worldID >= NTEMPLES + 1 && worldID < NTEMPLES + NTOWNS + 1)
@@ -577,12 +854,12 @@ bool Game::loadGame()
       world[worldID].loadMap("data/img/worldmap.png", "World Map", SOUND_WORLD_MAP, false);
       for(int i = 0; i < world[worldID].nnpcs; i++) world[worldID].npcs[i].path = NULL;
     }
-    fraction = static_cast<float>(worldID)/static_cast<float>(NWORLD + NCAVES);
+    fraction = static_cast<float>(worldID)/static_cast<float>(NWORLD + NCAVE_REGIONS*NLEVELS_REGION + 1);
     displayProgress("Loading Serpentine Caves", fraction);
   }
 
   // Load cave data
-  for(caveID = 0; caveID < NCAVES; caveID++)
+  for(caveID = 0; caveID < NCAVE_REGIONS*NLEVELS_REGION; caveID++)
   {
     nb = zip->getInt();
     zip->getData(nb, &caves[caveID]);
@@ -599,7 +876,7 @@ bool Game::loadGame()
     caves[caveID].loadMap();
     //for(int i = 0; i < caves[caveID].ncreatures; i++) caves[caveID].creatures[i].path = NULL;
 
-    fraction = static_cast<float>(caveID + NWORLD - 1)/static_cast<float>(NWORLD + NCAVES);
+    fraction = static_cast<float>(caveID + NWORLD)/static_cast<float>(NWORLD + NCAVE_REGIONS*NLEVELS_REGION + 1);
     displayProgress("Loading Serpentine Caves", fraction);
   }
   TCODConsole::root->setDefaultBackground(TCODColor::black);
@@ -628,7 +905,7 @@ bool Game::loadGame()
   menu.msgcon->printFrame(0, 0, 3*DISPLAY_WIDTH/4 - 2, NMSGS + 4, false, TCOD_BKGND_SET, "Message Log");
   for(int i = 0; i < NMSGS; i++) menu.msgcon->print(2, NMSGS + 1 - i, menu.messageLog[i]);
 
-  fraction = static_cast<float>(NWORLD + NCAVES - 1)/static_cast<float>(NWORLD + NCAVES);
+  fraction = static_cast<float>(NWORLD + NCAVE_REGIONS*NLEVELS_REGION)/static_cast<float>(NWORLD + NCAVE_REGIONS*NLEVELS_REGION + 1);
   displayProgress("Loading Serpentine Caves", fraction);
 
   // Load player data
@@ -639,7 +916,7 @@ bool Game::loadGame()
   // Update player stats
   player.updateStats();
 
-  fraction = static_cast<float>(NWORLD + NCAVES)/static_cast<float>(NWORLD + NCAVES);
+  fraction = static_cast<float>(NWORLD + NCAVE_REGIONS*NLEVELS_REGION + 1)/static_cast<float>(NWORLD + NCAVE_REGIONS*NLEVELS_REGION + 1);
   displayProgress("Loading Serpentine Caves", fraction);
 
   // Free zip object
@@ -667,7 +944,7 @@ void Game::handleInput(TCOD_key_t *key, TCOD_mouse_t mouse)
   // Keyboard input
   if(key->vk == TCODK_ESCAPE)
   {
-    bool otherMenus = (menu.displayItemShopMenu || menu.displayEquipShopMenu || menu.displayInnMenu || menu.displayFerryMenu);
+    bool otherMenus = (menu.displayItemShopMenu || menu.displayEquipShopMenu || menu.displayInnMenu || menu.displayFerryMenu || menu.displayInfoPage);
     if(menu.selection == NONE && !otherMenus)
     {
       // Toggle the volume for the game menu
@@ -677,7 +954,7 @@ void Game::handleInput(TCOD_key_t *key, TCOD_mouse_t mouse)
       menu.displayGameMenu = !menu.displayGameMenu;
     }
   }
-  else if(key->vk == TCODK_SHIFT)
+  else if(key->vk == TCODK_CONTROL)
   {
     // Rotate magic selection
     magicID = (magicID + 1) % MAX(1, NMAGIC);
@@ -687,11 +964,33 @@ void Game::handleInput(TCOD_key_t *key, TCOD_mouse_t mouse)
     // Toggle the pause
     sound.togglePause();
   }
+  else if(key->vk == TCODK_KPMUL)
+  {
+    // Toggle the pause
+    player.stats.spd++;
+    printf("SPD: %d\n", player.stats.spd);
+  }
+  else if(key->vk == TCODK_KPDIV)
+  {
+    // Toggle the pause
+    player.stats.spd--;
+    printf("SPD: %d\n", player.stats.spd);
+  }
   else if(key->vk == TCODK_BACKSPACE)
   {
     // Screenshot
     TCODSystem::saveScreenshot(NULL);
     //caves[caveID].saveMap();
+  }
+  else if(key->c == '?')
+  {
+    bool otherMenus = (menu.displayItemShopMenu || menu.displayEquipShopMenu || menu.displayInnMenu || menu.displayFerryMenu || menu.displayGameMenu);
+    if(menu.selection == NONE && !otherMenus)
+    {
+      // Toggle Info Page
+      menu.displayInfoPage = true;
+    }
+    key->vk = TCODK_NONE;
   }
   else if(key->lalt && key->vk == TCODK_ENTER)
   {
@@ -731,7 +1030,7 @@ void Game::setupEconomy()
   int iLow = 0, iHigh = 2;
   WorldMap *wmap = &world[0];
 
-  for(int i = TOWN_01; i <= TOWN_07; i++)
+  for(int i = TOWN_01; i <= TOWN_12; i++)
   {
     // Region 1
     if(wmap->locations[i].x >= IMAGE_WIDTH/2 && wmap->locations[i].y >= IMAGE_HEIGHT/2)
@@ -877,7 +1176,7 @@ void Game::updateEconomy()
   {
     totalItemCount[j] = 0;
     totalItemMaxCount[j] = 0;
-    for(int i = TOWN_01; i <= TOWN_07; i++)
+    for(int i = TOWN_01; i <= TOWN_12; i++)
     {
       totalItemCount[j] += wmap->locations[i].itemInv.count[j];
       totalItemMaxCount[j] += wmap->locations[i].itemInv.maxCount[j];
@@ -889,14 +1188,14 @@ void Game::updateEconomy()
   {
     totalHideCount[j] = 0;
     totalHideMaxCount[j] = 0;
-    for(int i = TOWN_01; i <= TOWN_07; i++)
+    for(int i = TOWN_01; i <= TOWN_12; i++)
     {
       totalHideCount[j] += wmap->locations[i].hideInv.count[j];
       totalHideMaxCount[j] += wmap->locations[i].hideInv.maxCount[j];
     }
   }
 
-  for(int i = TOWN_01; i <= TOWN_07; i++)
+  for(int i = TOWN_01; i <= TOWN_12; i++)
   {
     // Update item prices
     for(int j = 0; j < NITEMS - 6; j++)
@@ -980,6 +1279,10 @@ bool Game::update(float elapsed, TCOD_key_t key, TCOD_mouse_t mouse)
   // Increment the elapsed time
   elapsedTime += elapsed;
 
+  // Increment the waves and clouds offset
+  offsetW += 0.07f;
+  offsetC += 0.11f;
+
   // Handle keyboard and mouse input
   handleInput(&key, mouse);
 
@@ -1009,6 +1312,11 @@ bool Game::update(float elapsed, TCOD_key_t key, TCOD_mouse_t mouse)
     {
       // Update the game menu
       status = menu.updateGameMenu(key);
+    }
+    else if(menu.displayInfoPage)
+    {
+      // Update the death message
+      menu.updateInfoPage(key);
     }
     else if(menu.displayDeathMsg)
     {
@@ -1078,11 +1386,14 @@ bool Game::update(float elapsed, TCOD_key_t key, TCOD_mouse_t mouse)
       }
     }
 
-    bool openMenus = (menu.displayGameMenu || menu.displayItemShopMenu || menu.displayEquipShopMenu || menu.displayInnMenu || menu.displayFerryMenu || menu.displayDeathMsg);
+    bool openMenus = (menu.displayGameMenu || menu.displayItemShopMenu || menu.displayEquipShopMenu || menu.displayInnMenu || menu.displayFerryMenu || menu.displayDeathMsg || menu.displayInfoPage);
     if(!openMenus)
     {
       // Update Player
       player.update(elapsed, &key, mouse);
+
+      // Move the display
+      wmap->moveDisplay(player.x, player.y);
     }
 
     // Update Npcs
@@ -1093,6 +1404,11 @@ bool Game::update(float elapsed, TCOD_key_t key, TCOD_mouse_t mouse)
     {
       // Update the game menu
       status = menu.updateGameMenu(key);
+    }
+    else if(menu.displayInfoPage)
+    {
+      // Update the death message
+      menu.updateInfoPage(key);
     }
     else if(menu.displayItemShopMenu)
     {
@@ -1136,7 +1452,7 @@ void Game::render(bool *first)
     CaveMap *cmap = &caves[caveID];
     Item *items = cmap->items;
     Creature *creatures = cmap->creatures;
-    Corpse *corpses = cmap->corpses;
+    //Corpse *corpses = cmap->corpses;
     Hide *hides = cmap->hides;
     Location *locations = cmap->locations;
   
@@ -1289,6 +1605,11 @@ void Game::render(bool *first)
   {
     // Display the game menu
     menu.renderGameMenu();
+  }
+  else if(menu.displayInfoPage)
+  {
+    // Render the info page
+    menu.renderInfoPage();
   }
   else if(menu.displayItemShopMenu)
   {

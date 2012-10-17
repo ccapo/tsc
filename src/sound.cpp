@@ -43,15 +43,18 @@ void Sound::startup()
 {
 #ifndef NOSOUND
   static const char *music_files[NMUSIC] = {
-    "data/music/The_Saga_Begins.ogg",
-    "data/music/Woods_of_Eremae.ogg",
-    "data/music/Virtue_Lost.ogg",
-    "data/music/Rainy_Day.ogg",
-    "data/music/Cemetery.mp3",
-    "data/music/Suspicion.mp3",
-    "data/music/The_Hollows.mp3",
-    "data/music/Daemon.mp3",
-    "data/music/Battle_Against_Time.mp3"};
+    "data/music/The_Saga_Begins.ogg",       // Main Menu Music
+    "data/music/Time.mp3",                  // Build World Music
+    "data/music/Woods_of_Eremae.ogg",       // World Music
+    "data/music/Virtue_Lost.ogg",           // Temple Music
+    "data/music/Desert_Village.mp3",        // Town Music
+    "data/music/Rainy_Day.ogg",             // Good Night Music
+    "data/music/Cemetery.mp3",              // 1st Tier Cave Music
+    "data/music/Suspicion.mp3",             // 2nd Tier Cave Music
+    "data/music/The_Hollows.mp3",           // 3rd Tier Cave Music
+    "data/music/Daemon.mp3",                // Mini-Boss Battle Music
+    "data/music/Battle_Against_Time.mp3",   // Final Battle Music
+    "data/music/Far_Away.mp3"};             // End Credits Music
 
   result = FMOD_System_Create(&system);
   result = FMOD_System_SetOutput(system, FMOD_OUTPUTTYPE_ALSA);
@@ -108,7 +111,7 @@ void Sound::unload(int i)
 #endif
 }
 
-// Plays a sound (no argument to leave pause as dafault)
+// Plays a sound
 void Sound::play(int i)
 {
 #ifndef NOSOUND
@@ -157,7 +160,7 @@ void Sound::crossFade(float elapsed)
   static const float rate = 0.1f; // Crossfade rate
   static float vol = 0.0f;
 
-     if(possible)
+  if(possible)
   {
     if(vol < 1.0f)
     {
@@ -199,7 +202,7 @@ void Sound::togglePause()
 #ifndef NOSOUND
   FMOD_BOOL p;
 
-     if(possible)
+  if(possible)
   {
     FMOD_Channel_GetPaused(channel[activeChannel], &p);
     FMOD_Channel_SetPaused(channel[activeChannel], !p);

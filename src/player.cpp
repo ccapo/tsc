@@ -56,7 +56,16 @@ const float hitFlashDelay = 0.2f;
 const TCODColor flashColour = TCODColor::red;
 
 // The player constructor
-Player::Player(): lvl(0), xp(0), xpnext(xpLevel(1)), x(MAP_WIDTH/2), y(MAP_HEIGHT/2), colour(TCODColor::white), sym('@'), gp(100), walkTimer(0.0f), magicTimer(0.0f), hitFlashTimer(0.0f) {}
+Player::Player(): lvl(0), xp(0), xpnext(xpLevel(1)), x(MAP_WIDTH/2), y(MAP_HEIGHT/2), colour(TCODColor::white), gp(100), walkWait(0), magicTimer(0.0f), hitFlashTimer(0.0f)
+{
+  sym = CHAR_PLAYER_DOWN;
+  sym_up = CHAR_PLAYER_UP;
+  sym_down = CHAR_PLAYER_DOWN;
+  sym_left = CHAR_PLAYER_LEFT;
+  sym_right = CHAR_PLAYER_RIGHT;
+
+  stats.spd = 12;
+}
 
 // Update the player
 void Player::update(float elapsed, TCOD_key_t *key, TCOD_mouse_t mouse)
@@ -73,9 +82,6 @@ void Player::update(float elapsed, TCOD_key_t *key, TCOD_mouse_t mouse)
     }
     game.isFaded = false;
   }
-
-  // Increment walk timer
-  walkTimer += elapsed;
 
   // Replenish MP
   mpfraction += 0.125f*elapsed*static_cast<float>(stats.wil);
@@ -162,10 +168,13 @@ void Player::update(float elapsed, TCOD_key_t *key, TCOD_mouse_t mouse)
       }
     }
 
-    if(walkTimer*static_cast<float>(stats.spd) >= 1.0f)
+    if(walkWait > 0)
     {
-      walkTimer = 0.0f;
-
+      // Decrement walk wait
+      walkWait -= 1;
+    }
+    else
+    {
       if(TCODConsole::isKeyPressed(TCODK_UP))
       {
         if(y <= 1) y = 1;
@@ -176,7 +185,8 @@ void Player::update(float elapsed, TCOD_key_t *key, TCOD_mouse_t mouse)
             cmap->setFirstVisit(x, y, false);
             TCODConsole::root->putChar(x - d_x, y + 3 - d_y, ' ', TCOD_BKGND_NONE);
             y--;
-            TCODConsole::root->putChar(x - d_x, y + 3 - d_y, sym, TCOD_BKGND_NONE);
+            TCODConsole::root->putChar(x - d_x, y + 3 - d_y, sym_up, TCOD_BKGND_NONE);
+            sym = sym_up;
             cmap->setFirstVisit(x, y, true);
             cmap->recomputeFov = true;
           }
@@ -197,7 +207,8 @@ void Player::update(float elapsed, TCOD_key_t *key, TCOD_mouse_t mouse)
             cmap->setFirstVisit(x, y, false);
             TCODConsole::root->putChar(x - d_x, y + 3 - d_y, ' ', TCOD_BKGND_NONE);
             y++;
-            TCODConsole::root->putChar(x - d_x, y + 3 - d_y, sym, TCOD_BKGND_NONE);
+            TCODConsole::root->putChar(x - d_x, y + 3 - d_y, sym_down, TCOD_BKGND_NONE);
+            sym = sym_down;
             cmap->setFirstVisit(x, y, true);
             cmap->recomputeFov = true;
           }
@@ -218,7 +229,8 @@ void Player::update(float elapsed, TCOD_key_t *key, TCOD_mouse_t mouse)
             cmap->setFirstVisit(x, y, false);
             TCODConsole::root->putChar(x - d_x, y + 3 - d_y, ' ', TCOD_BKGND_NONE);
             x--;
-            TCODConsole::root->putChar(x - d_x, y + 3 - d_y, sym, TCOD_BKGND_NONE);
+            TCODConsole::root->putChar(x - d_x, y + 3 - d_y, sym_left, TCOD_BKGND_NONE);
+            sym = sym_left;
             cmap->setFirstVisit(x, y, true);
             cmap->recomputeFov = true;
           }
@@ -239,7 +251,8 @@ void Player::update(float elapsed, TCOD_key_t *key, TCOD_mouse_t mouse)
             cmap->setFirstVisit(x, y, false);
             TCODConsole::root->putChar(x - d_x, y + 3 - d_y, ' ', TCOD_BKGND_NONE);
             x++;
-            TCODConsole::root->putChar(x - d_x, y + 3 - d_y, sym, TCOD_BKGND_NONE);
+            TCODConsole::root->putChar(x - d_x, y + 3 - d_y, sym_right, TCOD_BKGND_NONE);
+            sym = sym_right;
             cmap->setFirstVisit(x, y, true);
             cmap->recomputeFov = true;
           }
@@ -261,7 +274,8 @@ void Player::update(float elapsed, TCOD_key_t *key, TCOD_mouse_t mouse)
             cmap->setFirstVisit(x, y, false);
             TCODConsole::root->putChar(x - d_x, y + 3 - d_y, ' ', TCOD_BKGND_NONE);
             x = px; y = py;
-            TCODConsole::root->putChar(x - d_x, y + 3 - d_y, sym, TCOD_BKGND_NONE);
+            TCODConsole::root->putChar(x - d_x, y + 3 - d_y, sym_down, TCOD_BKGND_NONE);
+            sym = sym_down;
             cmap->setFirstVisit(x, y, true);
             cmap->recomputeFov = true;
           }
@@ -272,6 +286,8 @@ void Player::update(float elapsed, TCOD_key_t *key, TCOD_mouse_t mouse)
           }
         }
       }
+      // Reset walk wait
+      walkWait = SPDMAX + SPDMIN - stats.spd;
     }
 
     if(key->lalt && key->vk == TCODK_PAGEUP)
@@ -280,7 +296,7 @@ void Player::update(float elapsed, TCOD_key_t *key, TCOD_mouse_t mouse)
     }
     if(key->lalt && key->vk == TCODK_PAGEDOWN)
     {
-      if(game.caveID != NCAVES - 1)
+      if(game.caveID != NCAVE_REGIONS - 1)
       {
         x = cmap->downx; y = cmap->downy;
       }
@@ -292,10 +308,13 @@ void Player::update(float elapsed, TCOD_key_t *key, TCOD_mouse_t mouse)
   {
     WorldMap *wmap = &game.world[game.worldID];
 
-    if(walkTimer*static_cast<float>(stats.spd) >= 1.0f)
+    if(walkWait > 0)
     {
-      walkTimer = 0.0f;
-
+      // Decrement walk wait
+      walkWait -= 1;
+    }
+    else
+    {
       if(TCODConsole::isKeyPressed(TCODK_UP))
       {
         if(y <= 1) y = 1;
@@ -305,7 +324,8 @@ void Player::update(float elapsed, TCOD_key_t *key, TCOD_mouse_t mouse)
           {
             TCODConsole::root->putChar(x, y + 3, ' ', TCOD_BKGND_NONE);
             y--;
-            TCODConsole::root->putChar(x, y + 3, sym, TCOD_BKGND_NONE);
+            TCODConsole::root->putChar(x, y + 3, sym_up, TCOD_BKGND_NONE);
+            sym = sym_up;
           }
         }
         if(y <= 0 && game.worldID > 0) exitWorldLocation();
@@ -319,7 +339,8 @@ void Player::update(float elapsed, TCOD_key_t *key, TCOD_mouse_t mouse)
           {
             TCODConsole::root->putChar(x, y + 3, ' ', TCOD_BKGND_NONE);
             y++;
-            TCODConsole::root->putChar(x, y + 3, ' ', TCOD_BKGND_NONE);
+            TCODConsole::root->putChar(x, y + 3, sym_down, TCOD_BKGND_NONE);
+            sym = sym_down;
           }
         }
         if(y >= IMAGE_HEIGHT - 1 && game.worldID > 0) exitWorldLocation();
@@ -333,7 +354,8 @@ void Player::update(float elapsed, TCOD_key_t *key, TCOD_mouse_t mouse)
           {
             TCODConsole::root->putChar(x, y + 3, ' ', TCOD_BKGND_NONE);
             x--;
-            TCODConsole::root->putChar(x, y + 3, ' ', TCOD_BKGND_NONE);
+            TCODConsole::root->putChar(x, y + 3, sym_left, TCOD_BKGND_NONE);
+            sym = sym_left;
           }
         }
         if(x <= 0 && game.worldID > 0) exitWorldLocation();
@@ -347,13 +369,15 @@ void Player::update(float elapsed, TCOD_key_t *key, TCOD_mouse_t mouse)
           {
             TCODConsole::root->putChar(x, y + 3, ' ', TCOD_BKGND_NONE);
             x++;
-            TCODConsole::root->putChar(x, y + 3, ' ', TCOD_BKGND_NONE);
+            TCODConsole::root->putChar(x, y + 3, sym_right, TCOD_BKGND_NONE);
+            sym = sym_right;
           }
         }
         if(x >= IMAGE_WIDTH - 1 && game.worldID > 0) exitWorldLocation();
       }
+      // Reset walk wait
+      walkWait = SPDMAX + SPDMIN - stats.spd;
     }
-
     if(key->vk == TCODK_ENTER) actionWorldMap();
   }
 
@@ -418,7 +442,7 @@ void Player::render()
 
       for(int i = barx; i < barx + barLength; i++)
       {
-        TCODConsole::root->putCharEx(i, bary, TCOD_CHAR_CHARGEBAR, TCODColor::lightRed, TCODColor::darkRed);
+        TCODConsole::root->putCharEx(i, bary, CHAR_CHARGEBAR, TCODColor::lightRed, TCODColor::darkRed);
       }
     }
   }
@@ -635,7 +659,7 @@ void Player::actionWorldMap()
     sprintf(buffer, "Entered %s\n", wmap->locations[id].name);
     game.menu.updateMessageLog(buffer);
 
-    game.worldID = 0;
+    game.worldID = id + 1;
     game.caveID = 0;
     game.inCaves = true;
     game.sound.first = true;
@@ -706,7 +730,7 @@ void Player::exitCaveLocation()
   {
     game.caveID++;
 
-    if(game.caveID < NCAVES)
+    if(game.caveID < NCAVE_REGIONS)
     {
       // Fade out
       for(int fade = 255; fade >= 0; fade -= 25)
@@ -719,7 +743,7 @@ void Player::exitCaveLocation()
       if(path) delete path;
       cmap = &game.caves[game.caveID];
       x = cmap->upx; y = cmap->upy;
-      if(game.caveID % NLEVELS == 0 || game.caveID == NCAVES - 1) game.sound.first = true;
+      if(game.caveID % NLEVELS_REGION == 0 || game.caveID == NCAVE_REGIONS - 1) game.sound.first = true;
       path = new TCODPath(cmap->fov1x);
       path->compute(cmap->upx, cmap->upy, cmap->downx, cmap->downy);
 
@@ -728,7 +752,7 @@ void Player::exitCaveLocation()
     }
     else
     {
-      game.caveID = NCAVES - 1;
+      game.caveID = NCAVE_REGIONS - 1;
       game.sound.first = true;
     }
   }
@@ -739,15 +763,16 @@ void Player::exitCaveLocation()
     if(game.caveID < 0)
     {
       if(path) delete path;
+      int id = MAX(0, game.worldID - 1);
       game.caveID = 0;
       game.worldID = 0;
       game.inCaves = false;
       game.sound.first = true;
       WorldMap *wtmp = &game.world[game.worldID];
-      x = wtmp->locations[CAVE_SERPENTINE].x; y = wtmp->locations[CAVE_SERPENTINE].y;
+      x = wtmp->locations[id].x; y = wtmp->locations[id].y;
 
       // Print to message log
-      sprintf(buffer, "Left %s\n", wtmp->locations[CAVE_SERPENTINE].name);
+      sprintf(buffer, "Left %s\n", wtmp->locations[id].name);
       game.menu.updateMessageLog(buffer);
 
       // Move the display
@@ -777,7 +802,7 @@ void Player::exitCaveLocation()
       if(path) delete path;
       cmap = &game.caves[game.caveID];
       x = cmap->downx; y = cmap->downy;
-      if((game.caveID + 1) % NLEVELS == 0 || game.caveID == NCAVES - 2) game.sound.first = true;
+      if((game.caveID + 1) % NLEVELS_REGION == 0 || game.caveID == NCAVE_REGIONS - 2) game.sound.first = true;
       path = new TCODPath(cmap->fov1x);
       path->compute(cmap->downx, cmap->downy, cmap->upx, cmap->upy);
 
