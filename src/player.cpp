@@ -64,7 +64,7 @@ Player::Player(): lvl(0), xp(0), xpnext(xpLevel(1)), x(MAP_WIDTH/2), y(MAP_HEIGH
   sym_left = CHAR_PLAYER_LEFT;
   sym_right = CHAR_PLAYER_RIGHT;
 
-  stats.spd = 12;
+  stats.spd = 18;
 }
 
 // Update the player
