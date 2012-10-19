@@ -3,8 +3,8 @@ INCDIR = include
 #LFLAGS = -Llib -ltcod -ltcodxx -lfmodex -lm -Wl,-rpath=lib
 LFLAGS = -Llib64 -ltcod -ltcodxx -lfmodex -lm -Wl,-rpath=lib64
 CPP = g++
-#CFLAGS = -O3 -w -I$(INCDIR)/tsc -I$(INCDIR)/tcod -I$(INCDIR)/fmodex
-CFLAGS = -O3 -w -I$(INCDIR)/tsc -I$(INCDIR)/tcod -I$(INCDIR)/fmodex -DNOSOUND
+CFLAGS = -O3 -w -I$(INCDIR)/tsc -I$(INCDIR)/tcod -I$(INCDIR)/fmodex
+#CFLAGS = -O3 -w -I$(INCDIR)/tsc -I$(INCDIR)/tcod -I$(INCDIR)/fmodex -DNOSOUND
 #CFLAGS = -O0 -g -Wall -I$(INCDIR)/tsc -I$(INCDIR)/tcod -I$(INCDIR)/fmodex -DNOSOUND
 
 UPX = ./dependencies/upx-3.08/linux-i386/upx -qq
