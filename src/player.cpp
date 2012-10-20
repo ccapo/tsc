@@ -56,15 +56,13 @@ const float hitFlashDelay = 0.2f;
 const TCODColor flashColour = TCODColor::red;
 
 // The player constructor
-Player::Player(): lvl(0), xp(0), xpnext(xpLevel(1)), x(MAP_WIDTH/2), y(MAP_HEIGHT/2), colour(TCODColor::white), gp(100), walkWait(0), magicTimer(0.0f), hitFlashTimer(0.0f)
+Player::Player(): lvl(0), xp(0), xpnext(xpLevel(1)), x(MAP_WIDTH/2), y(MAP_HEIGHT/2), colour(TCODColor::white), gp(100), walkTimer(0.0f), magicTimer(0.0f), hitFlashTimer(0.0f)
 {
   sym = CHAR_PLAYER_DOWN;
   sym_up = CHAR_PLAYER_UP;
   sym_down = CHAR_PLAYER_DOWN;
   sym_left = CHAR_PLAYER_LEFT;
   sym_right = CHAR_PLAYER_RIGHT;
-
-  stats.spd = 18;
 }
 
 // Update the player
@@ -82,6 +80,9 @@ void Player::update(float elapsed, TCOD_key_t *key, TCOD_mouse_t mouse)
     }
     game.isFaded = false;
   }
+
+  // Increment walk timer
+  walkTimer += elapsed;
 
   // Replenish MP
   mpfraction += 0.125f*elapsed*static_cast<float>(stats.wil);
@@ -168,13 +169,10 @@ void Player::update(float elapsed, TCOD_key_t *key, TCOD_mouse_t mouse)
       }
     }
 
-    if(walkWait > 0)
+    if(walkTimer*static_cast<float>(stats.spd) >= 1.0f)
     {
-      // Decrement walk wait
-      walkWait -= 1;
-    }
-    else
-    {
+      walkTimer = 0.0f;
+
       if(TCODConsole::isKeyPressed(TCODK_UP))
       {
         if(y <= 1) y = 1;
@@ -286,8 +284,6 @@ void Player::update(float elapsed, TCOD_key_t *key, TCOD_mouse_t mouse)
           }
         }
       }
-      // Reset walk wait
-      walkWait = SPDMAX + SPDMIN - stats.spd;
     }
 
     if(key->lalt && key->vk == TCODK_PAGEUP)
@@ -308,13 +304,10 @@ void Player::update(float elapsed, TCOD_key_t *key, TCOD_mouse_t mouse)
   {
     WorldMap *wmap = &game.world[game.worldID];
 
-    if(walkWait > 0)
+    if(walkTimer*static_cast<float>(stats.spd) >= 1.0f)
     {
-      // Decrement walk wait
-      walkWait -= 1;
-    }
-    else
-    {
+      walkTimer = 0.0f;
+
       if(TCODConsole::isKeyPressed(TCODK_UP))
       {
         if(y <= 1) y = 1;
@@ -375,8 +368,6 @@ void Player::update(float elapsed, TCOD_key_t *key, TCOD_mouse_t mouse)
         }
         if(x >= IMAGE_WIDTH - 1 && game.worldID > 0) exitWorldLocation();
       }
-      // Reset walk wait
-      walkWait = SPDMAX + SPDMIN - stats.spd;
     }
     if(key->vk == TCODK_ENTER) actionWorldMap();
   }

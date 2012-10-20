@@ -54,70 +54,70 @@
 class Player
 {
   public:
-  Stats base;                // Player's Base Stats
-  Stats stats;                // Player's Current Stats
-  Health health;                // Player's Health Status
-  int lvl;                // Player's Level
-  int xp, xpnext;                // Experience Points, Experience Points for Next Level
-  int x, y;                // Player Position
-  TCODColor colour;              // Player Colour
-  int sym;                // Player Symbol
-  int sym_up;                // Player Symbol
-  int sym_down;                // Player Symbol
-  int sym_left;                // Player Symbol
-  int sym_right;                // Player Symbol
-  int gp;                  // Player Gold Points
-  int walkWait;              // Player's Walk Wait
-  float magicTimer;              // Player's Magic Timer
-  float hitFlashTimer;              // Player's Hit Flash Timer
-  TCODPath *path;                // Player's path object
+  Stats base;                                   // Player's Base Stats
+  Stats stats;                                  // Player's Current Stats
+  Health health;                                // Player's Health Status
+  int lvl;                                      // Player's Level
+  int xp, xpnext;                               // Experience Points, Experience Points for Next Level
+  int x, y;                                     // Player Position
+  TCODColor colour;                             // Player Colour
+  int sym;                                      // Player Symbol
+  int sym_up;                                   // Player Symbol
+  int sym_down;                                 // Player Symbol
+  int sym_left;                                 // Player Symbol
+  int sym_right;                                // Player Symbol
+  int gp;                                       // Player Gold Points
+  float walkTimer;                              // Player's Walk Timer
+  float magicTimer;                             // Player's Magic Timer
+  float hitFlashTimer;                          // Player's Hit Flash Timer
+  TCODPath *path;                               // Player's path object
 
-  ItemInventory itemInv;              // Item Inventory
-  EquipInventory equipInv;            // Equipment Inventory
-  HideInventory hideInv;              // Hide Inventory
+  ItemInventory itemInv;                        // Item Inventory
+  EquipInventory equipInv;                      // Equipment Inventory
+  HideInventory hideInv;                        // Hide Inventory
 
-  Player();                // Player Constructor
+  Player();                                     // Player Constructor
 
   void update(float elapsed, TCOD_key_t *key, TCOD_mouse_t mouse);  // Update Player
-  void render();                // Render Player
+  void render();                                // Render Player
 
-  void updateStats();              // Update Player stats
-  void updateStatus();              // Update Player status
-  void takeDamage(Creature cr);            // Player Take Damage
+  void updateStats();                           // Update Player stats
+  void updateStatus();                          // Update Player status
+  void takeDamage(Creature cr);                 // Player Take Damage
 
   // World and Cave Maps
-  void actionWorldMap();              // Player Action on the World Map
-  void exitWorldLocation();            // Player Exits a World Location
-  void exitCaveLocation();            // Player Exits a Cave Location
-  void takeFerry(int id);              // Player Takes a Ferry to Location id
-  void stayInn();                // Player Stays at the Inn
+  void actionWorldMap();                        // Player Action on the World Map
+  void exitWorldLocation();                     // Player Exits a World Location
+  void exitCaveLocation();                      // Player Exits a Cave Location
+  void takeFerry(int id);                       // Player Takes a Ferry to Location id
+  void stayInn();                               // Player Stays at the Inn
 
-  void hitFlash();              // Update flash timer when the Player is hit
+  void hitFlash();                              // Update flash timer when the Player is hit
 
   // Item Inventory
-  bool addItem(int itemIndex);            // Method to add a specified item to inventory
-  void useItem(int *cursorIndex);            // Method to use a specified item from inventory
-  void buyItem(int *cursorIndex);            // Method to buy a specified item from town inventory
-  void sellItem(int *cursorIndex);          // Method to sell a specified item to town inventory
-  void sellHide(int *cursorIndex);          // Method to sell a specified hide to town inventory
+  bool addItem(int itemIndex);                  // Method to add a specified item to inventory
+  void useItem(int *cursorIndex);               // Method to use a specified item from inventory
+  void buyItem(int *cursorIndex);               // Method to buy a specified item from town inventory
+  void sellItem(int *cursorIndex);              // Method to sell a specified item to town inventory
+  void sellHide(int *cursorIndex);              // Method to sell a specified hide to town inventory
 
   // Equipment Inventory
-  void changeEquipment(int iEquip, int index);        // Method to Change Equipment
+  void changeEquipment(int iEquip, int index);  // Method to Change Equipment
 
   // Hide Inventory
-  bool addHide(int hideIndex);            // Method to add a specified hide to inventory
+  bool addHide(int hideIndex);                  // Method to add a specified hide to inventory
 
-  int xpLevel(int level);              // XP for a given level
+  int xpLevel(int level);                       // XP for a given level
 
-  int hpLevel(int level);              // Max. HP for a given level
-  int apLevel(int level);              // AP for a given level
-  int dpLevel(int level);              // DP for a given level
-  int strLevel(int level);            // STR for a given level
-  int spdLevel(int level);            // SPD for a given level
+  int hpLevel(int level);                       // Max. HP for a given level
+  int apLevel(int level);                       // AP for a given level
+  int dpLevel(int level);                       // DP for a given level
+  int strLevel(int level);                      // STR for a given level
+  int spdLevel(int level);                      // SPD for a given level
 
-  int mpLevel(int level);              // Max. MP for a given level
-  int mapLevel(int level);            // MAP for a given level
-  int mdpLevel(int level);            // MDP for a given level
-  int wilLevel(int level);            // WIL for a given level
-  int acuLevel(int level);            // ACU for a given level
+  int mpLevel(int level);                       // Max. MP for a given level
+  int mapLevel(int level);                      // MAP for a given level
+  int mdpLevel(int level);                      // MDP for a given level
+  int wilLevel(int level);                      // WIL for a given level
+  int acuLevel(int level);                      // ACU for a given level
 };

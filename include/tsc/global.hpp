@@ -145,7 +145,7 @@ using namespace std;
 #define STRMIN 10
 #define STRMAX 50
 
-#define SPDMIN 0
+#define SPDMIN 12
 #define SPDMAX 24
 
 #define MPMIN 15

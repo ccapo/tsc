@@ -101,7 +101,7 @@ class Creature
   char name[CHARMAX];                                    // Creature Name
   TCODColor colour;                                      // Creature Colour
   int sym;                                               // Creature Symbol
-  int walkWait;                                          // Creature's Walk Wait
+  float walkTimer;                                       // Creature's Walk Timer
   float scentThreshold;                                  // Creature's Scent Threshold
   bool inUse;                                            // Creature's In Use flag
   //TCODPath *path;                                      // Creature's Path object
@@ -180,7 +180,7 @@ class Npc
   char label[CHARMAX];                                   // Npc Label
   TCODColor colour;                                      // Npc Colour
   int sym;                                               // Npc Symbol
-  float walkWait;                                        // Npc Walk Wait
+  float walkTimer;                                       // Npc Walk Timer
   bool inUse;                                            // Npc In Use flag
   TCODPath *path;                                        // Npc Path object
 
