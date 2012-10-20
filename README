@@ -3,6 +3,9 @@ This is the repository for my roleplaying rogue-like game: The Sepertine Caves
 The game is still in early development, but I hope to have a fully functioning
 version in the near future.
 
+I am currently redesigning the code to make use of state machines, which will
+make the code more organized and make it easier to incorporate new components.
+
 The game is playable, but many of the components have not been implemented,
 most notably the final boss. Also, the monsters can't attack you.
 
