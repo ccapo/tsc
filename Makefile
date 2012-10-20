@@ -1,7 +1,7 @@
 SRCDIR = src
 INCDIR = include
-#LFLAGS = -Llib -ltcod -ltcodxx -lfmodex -lm -Wl,-rpath=lib
-LFLAGS = -Llib64 -ltcod -ltcodxx -lfmodex -lm -Wl,-rpath=lib64
+LFLAGS = -Llib/i386 -ltcod -ltcodxx -lfmodex -lm -Wl,-rpath=lib/i386
+#LFLAGS = -Llib/x86_64 -ltcod -ltcodxx -lfmodex -lm -Wl,-rpath=lib/x86_64
 CPP = g++
 CFLAGS = -O3 -w -I$(INCDIR)/tsc -I$(INCDIR)/tcod -I$(INCDIR)/fmodex
 #CFLAGS = -O3 -w -I$(INCDIR)/tsc -I$(INCDIR)/tcod -I$(INCDIR)/fmodex -DNOSOUND
