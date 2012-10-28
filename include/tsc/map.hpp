@@ -120,13 +120,6 @@ class WorldMap
   char label[CHARMAX];
   int musicID;
 
-  // Colour map
-  float hWater;
-  float hSand;
-  float hGrass;
-  float hMax;
-  TCODColor colourMap[NCOLOURMAP];
-
   TCODColor darkWall;
   TCODColor lightWall;
   TCODColor darkGround;
@@ -142,15 +135,6 @@ class WorldMap
 
   // Renders World Map
   void render(Player player);
-
-  // Adds hills to a height map
-  void addHill(TCODHeightMap *hmap, int nHill, float baseRadius, float radiusVar, float height);
-
-  // Generates a height map
-  void generateHM(TCODHeightMap *hmap);
-
-  // Generates a map
-  void generateMap();
 
   // Loads a map
   void loadMap(const char filename[], const char name[], int musicIndex, bool init = true);
@@ -272,6 +256,4 @@ class CaveMap
   void updateScent(int x, int y);
 
   bool hasLos(int xFrom, int yFrom, int xTo, int yTo, bool ignoreCreatures);
-
-  void saveMap();
 };

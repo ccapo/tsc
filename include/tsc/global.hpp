@@ -95,9 +95,6 @@ using namespace std;
 // Number of fonts
 #define NFONTS 3
 
-// Number of colours in colour map
-#define NCOLOURMAP 5
-
 // Max. size of lists
 #define NITEMMAX 64
 #define NCREATUREMAX 1024
@@ -166,7 +163,7 @@ using namespace std;
 #define ACUMIN 1
 #define ACUMAX 50
 
-// Macros
+// Macros (Ugly, I know...)
 #define IN_RECTANGLE(x,y,w,h) ((unsigned)(x) < (unsigned)(w) && (unsigned)(y) < (unsigned)(h))
 
 #define SQRDIST(x1,y1,x2,y2) (((x1)-(x2))*((x1)-(x2))+((y1)-(y2))*((y1)-(y2)))
