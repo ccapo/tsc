@@ -51,7 +51,7 @@
 #include "main.hpp"
 
 // The default creature constructor
-Creature::Creature(): lvl(1), x(0), y(0), creatureType(CREATURETYPE_INSECT), colour(TCODColor::white), walkTimer(1.0f), scentThreshold(0.0f), inUse(false)
+Creature::Creature(): lvl(1), x(0), y(0), creatureType(CREATURETYPE_INSECT), colour(TCODColor::white), displacement(1.0f), scentThreshold(0.0f), inUse(false)
 {
   sprintf(name, "%s", "Green Spider");
   sym = CHAR_SPIDER_GREEN;
@@ -59,7 +59,7 @@ Creature::Creature(): lvl(1), x(0), y(0), creatureType(CREATURETYPE_INSECT), col
 }
 
 // The creature constructor
-Creature::Creature(int x0, int y0, ECreatureType creatureType0): x(x0), y(y0), creatureType(creatureType0), colour(TCODColor::white), walkTimer(1.0f), inUse(true)
+Creature::Creature(int x0, int y0, ECreatureType creatureType0): x(x0), y(y0), creatureType(creatureType0), colour(TCODColor::white), displacement(1.0f), inUse(true)
 {
   switch(creatureType)
   {
@@ -252,12 +252,12 @@ void Creature::update(Player player, float elapsed)
 
   if(inUse)
   {
-    // Increment walk timer
-    walkTimer += elapsed;
+    // Increment displacement
+    displacement += elapsed*static_cast<float>(stats.spd);
 
-    if(walkTimer*static_cast<float>(stats.spd) >= 1.0f)
+    if(displacement >= 1.0f)
     {
-      walkTimer = 0.0f;
+      displacement = 0.0f;
 
       switch(creatureType)
       {
@@ -508,14 +508,14 @@ HideInventory::HideInventory(void)
 }
 
 // The default Npc constructor
-Npc::Npc(): x(0), y(0), spd(3), npcType(NPCTYPE_TOWNSPERSON), colour(TCODColor::lightSepia), walkTimer(1.0f), inUse(false)
+Npc::Npc(): x(0), y(0), spd(3), npcType(NPCTYPE_TOWNSPERSON), colour(TCODColor::lightSepia), displacement(1.0f), inUse(false)
 {
   sprintf(label, "%s", "Townsperson");
   path = NULL;
 }
 
 // The Npc constructor
-Npc::Npc(int x0, int y0, int spd0, ENpcType npcType0): x(x0), y(y0), spd(spd0), npcType(npcType0), walkTimer(1.0f), inUse(true)
+Npc::Npc(int x0, int y0, int spd0, ENpcType npcType0): x(x0), y(y0), spd(spd0), npcType(npcType0), displacement(1.0f), inUse(true)
 {
   switch(npcType)
   {
@@ -604,12 +604,12 @@ void Npc::update(Player player, float elapsed)
   {
     if(IN_RECTANGLE(x, y + 3, DISPLAY_WIDTH, DISPLAY_HEIGHT))
     {
-      // Increment walk timer
-      walkTimer += elapsed;
+      // Increment displacement
+      displacement += elapsed*static_cast<float>(spd);
 
-      if(walkTimer*static_cast<float>(spd) >= 1.0f)
+      if(displacement >= 1.0f)
       {
-        walkTimer = 0.0f;
+        displacement = 0.0f;
 
         if(path)
         {
@@ -632,7 +632,7 @@ void Npc::update(Player player, float elapsed)
           {
             delete path;
             path = NULL;
-            walkTimer = -12.0f*elapsed;
+            displacement = -12.0f*elapsed;
           }
         }
         else

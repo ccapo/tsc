@@ -67,7 +67,7 @@ class Player
   int sym_left;                                 // Player Symbol
   int sym_right;                                // Player Symbol
   int gp;                                       // Player Gold Points
-  float walkTimer;                              // Player's Walk Timer
+  float displacement;                           // Player's Displacement
   float magicTimer;                             // Player's Magic Timer
   float hitFlashTimer;                          // Player's Hit Flash Timer
   TCODPath *path;                               // Player's path object
@@ -99,22 +99,20 @@ class Player
   void useItem(int *cursorIndex);               // Method to use a specified item from inventory
   void buyItem(int *cursorIndex);               // Method to buy a specified item from town inventory
   void sellItem(int *cursorIndex);              // Method to sell a specified item to town inventory
-  void sellHide(int *cursorIndex);              // Method to sell a specified hide to town inventory
 
   // Equipment Inventory
   void changeEquipment(int iEquip, int index);  // Method to Change Equipment
 
   // Hide Inventory
   bool addHide(int hideIndex);                  // Method to add a specified hide to inventory
+  void sellHide(int *cursorIndex);              // Method to sell a specified hide to town inventory
 
   int xpLevel(int level);                       // XP for a given level
-
   int hpLevel(int level);                       // Max. HP for a given level
   int apLevel(int level);                       // AP for a given level
   int dpLevel(int level);                       // DP for a given level
   int strLevel(int level);                      // STR for a given level
   int spdLevel(int level);                      // SPD for a given level
-
   int mpLevel(int level);                       // Max. MP for a given level
   int mapLevel(int level);                      // MAP for a given level
   int mdpLevel(int level);                      // MDP for a given level

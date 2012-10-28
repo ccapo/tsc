@@ -2,9 +2,8 @@ SRCDIR = src
 INCDIR = include
 CPP = g++
 
-# Compiler Flags
-#CFLAGS = -O3 -Wall -I$(INCDIR)/tsc -I$(INCDIR)/tcod -I$(INCDIR)/fmodex
-CFLAGS = -O3 -Wall -I$(INCDIR)/tsc -I$(INCDIR)/tcod -I$(INCDIR)/fmodex -DNOSOUND
+CFLAGS = -O3 -ffinite-math-only -finline-small-functions -fmove-loop-invariants -foptimize-register-move -foptimize-sibling-calls -freorder-functions -funroll-all-loops -fdata-sections -w -I$(INCDIR)/tsc -I$(INCDIR)/tcod -I$(INCDIR)/fmodex
+#CFLAGS = -O3 -ffinite-math-only -finline-small-functions -fmove-loop-invariants -foptimize-register-move -foptimize-sibling-calls -freorder-functions -funroll-all-loops -fdata-sections -w -I$(INCDIR)/tsc -I$(INCDIR)/tcod -I$(INCDIR)/fmodex -DNOSOUND
 #CFLAGS = -O0 -g -Wall -I$(INCDIR)/tsc -I$(INCDIR)/tcod -I$(INCDIR)/fmodex -DNOSOUND
 
 # Determine if operating system is 32-bit or 64-bit

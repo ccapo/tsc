@@ -85,6 +85,9 @@ using namespace std;
 #define IMAGE_WIDTH2 (2*IMAGE_WIDTH)
 #define IMAGE_HEIGHT2 (2*IMAGE_HEIGHT)
 
+// Maximum frame rate
+#define FPSMAX 25
+
 // Range of the height map
 #define HM_MIN 0.75f
 #define HM_MAX 0.95f
@@ -145,8 +148,8 @@ using namespace std;
 #define STRMIN 10
 #define STRMAX 50
 
-#define SPDMIN 12
-#define SPDMAX 24
+#define SPDMIN 1
+#define SPDMAX FPSMAX
 
 #define MPMIN 15
 #define MPMAX 250

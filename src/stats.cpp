@@ -65,7 +65,7 @@ const char *statusName[NSTATUS] = {
 };
 
 // The Stats Constructor
-Stats::Stats(): hpmax(HPMIN), hp(HPMIN), ap(APMIN), dp(DPMIN), str(STRMIN), spd(SPDMIN), mpmax(MPMIN), mp(MPMIN), map(MAPMIN), mdp(MDPMIN), wil(WILMIN), acu(ACUMIN) {}
+Stats::Stats(): hpmax(HPMIN), hp(HPMIN), ap(APMIN), dp(DPMIN), str(STRMIN), spd((SPDMAX - SPDMIN)/3), mpmax(MPMIN), mp(MPMIN), map(MAPMIN), mdp(MDPMIN), wil(WILMIN), acu(ACUMIN) {}
 
 // The Compound Assignment Operator
 Stats &Stats::operator+= (const Stats &rhs)

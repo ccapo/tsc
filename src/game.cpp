@@ -69,20 +69,20 @@ Game::Game(): inCaves(false), isFaded(false), worldID(0), caveID(0), magicID(0),
   weather = new TCODNoise(3, rng);
 
   p = 0.5f;
-  printf("Before: %f\n", p);
+  //printf("Before: %f\n", p);
   offsetW = 0.5f*(1.0f + torch->get(&p)); //0.18f;
-  printf("After #1: %f\n", p);
+  //printf("After #1: %f\n", p);
   p += 0.5f;
-  printf("After #2: %f\n", p);
+  //printf("After #2: %f\n", p);
   offsetC = 0.5f*(1.0f + torch->get(&p)); //0.23f;
-  printf("After #3: %f\n", p);
-  printf("%f %f\n", offsetW, offsetC);
+  //printf("After #3: %f\n", p);
+  //printf("%f %f\n", offsetW, offsetC);
 
   player.x = IMAGE_WIDTH/2;
   player.y = IMAGE_HEIGHT/2 + 1;
 
-//  guardian = NULL;
-//  boss = NULL;
+	//guardian = NULL;
+	//boss = NULL;
 }
 
 Game::~Game()
@@ -99,11 +99,11 @@ Game::~Game()
   if(weather) delete weather;
   weather = NULL;
 
-//  if(guardian) delete guardian;
-//  guardian = NULL;
+	//if(guardian) delete guardian;
+	//guardian = NULL;
 
-//  if(boss) delete boss;
-//  boss = NULL;
+	//if(boss) delete boss;
+	//boss = NULL;
 }
 
 // This method initializes the game
@@ -113,8 +113,8 @@ void Game::startup(int narg, char *argv[])
                                        "data/fonts/arial8x8.png",
                                        "data/fonts/arial16x16.png"};
   int fontFlags = TCOD_FONT_LAYOUT_TCOD | TCOD_FONT_TYPE_GREYSCALE;
-  int iFont = 1, nCol = 32, nRow = 13, maxFps = 24;
-  int initialDelay = 100, interval = 10;
+  int iFont = 1, nCol = 32, nRow = 13;
+  int initialDelay = 100, interval = 1000/MAX(10,FPSMAX);
   bool fullscreen = false;
   TCOD_renderer_t renderer = TCOD_RENDERER_SDL;
 
@@ -131,7 +131,7 @@ void Game::startup(int narg, char *argv[])
   TCODMouse::showCursor(true);
 
   // Limit the framerate to maxFps FPS
-  TCODSystem::setFps(maxFps);
+  TCODSystem::setFps(FPSMAX);
 
   // Assign extra ascii keys
   int x = 0, y = 8;
@@ -677,7 +677,7 @@ bool Game::newGame()
     displayProgress("Generating Serpentine Caves", fraction);
 
     // Crossfade between the two sound channels
-    if(sound.crossFading) sound.crossFade(TCODSystem::getLastFrameLength());
+    if(sound.crossFading) sound.crossFade(1.0f/static_cast<float>(FPSMAX));
   }
 
   for(caveID = 0; caveID < NCAVE_REGIONS*NLEVELS_REGION; caveID++)
@@ -687,7 +687,7 @@ bool Game::newGame()
     displayProgress("Generating Serpentine Caves", fraction);
 
     // Crossfade between the two sound channels
-    if(sound.crossFading) sound.crossFade(TCODSystem::getLastFrameLength());
+    if(sound.crossFading) sound.crossFade(1.0f/static_cast<float>(FPSMAX));
   }
   TCODConsole::root->setDefaultBackground(TCODColor::black);
 

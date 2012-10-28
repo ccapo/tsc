@@ -54,20 +54,20 @@ int main(int narg, char *argv[])
 {
   bool startGame = false, newGame = false;
   bool firstFade = false, endGame = false;
+	float elapsed = 1.0f/static_cast<float>(FPSMAX);
   TCOD_key_t key;
   TCOD_mouse_t mouse;
-  TCOD_event_t event;
 
   // Startup Game
   game.startup(narg, argv);
 
-  event = TCODSystem::checkForEvent(TCOD_EVENT_KEY_PRESS, &key, &mouse);
+  TCODSystem::checkForEvent(TCOD_EVENT_KEY_PRESS, &key, &mouse);
 
   // Loop Title Screen
   while(!startGame && !TCODConsole::isWindowClosed())
   {
     // Update the game
-    startGame = game.updateTitle(TCODSystem::getLastFrameLength(), key);
+    startGame = game.updateTitle(elapsed, key);
 
     // Render the game screen
     game.renderTitle();
@@ -76,7 +76,7 @@ int main(int narg, char *argv[])
     TCODConsole::root->flush();
 
     // Get keyboard and mouse input
-    event = TCODSystem::checkForEvent(TCOD_EVENT_KEY_PRESS, &key, &mouse);
+    TCODSystem::checkForEvent(TCOD_EVENT_KEY_PRESS, &key, &mouse);
   }
 
   // Loop Introdution Screen (New Games Only)
@@ -86,7 +86,7 @@ int main(int narg, char *argv[])
   while(newGame)
   {
     // Update the game
-    newGame = game.updateIntro(TCODSystem::getLastFrameLength(), key);
+    newGame = game.updateIntro(elapsed, key);
 
     // Render the game screen
     game.renderIntro();
@@ -95,14 +95,14 @@ int main(int narg, char *argv[])
     TCODConsole::root->flush();
 
     // Get keyboard and mouse input
-    event = TCODSystem::checkForEvent(TCOD_EVENT_KEY_PRESS, &key, &mouse);
+    TCODSystem::checkForEvent(TCOD_EVENT_KEY_PRESS, &key, &mouse);
   }
 
   // Loop Game
   while(!endGame && !TCODConsole::isWindowClosed())
   {
     // Update the game
-    endGame = game.update(TCODSystem::getLastFrameLength(), key, mouse);
+    endGame = game.update(elapsed, key, mouse);
 
     // Render the game screen
     game.render(&firstFade);
@@ -111,11 +111,11 @@ int main(int narg, char *argv[])
     TCODConsole::root->flush();
 
     // Get keyboard and mouse input
-    event = TCODSystem::checkForEvent(TCOD_EVENT_KEY_PRESS | TCOD_EVENT_MOUSE, &key, &mouse);
+    TCODSystem::checkForEvent(TCOD_EVENT_KEY_PRESS | TCOD_EVENT_MOUSE, &key, &mouse);
   }
 
   // Shutdown Game
   game.shutdown();
 
-  return 1;  
+  return 0;  
 }

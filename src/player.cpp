@@ -56,7 +56,7 @@ const float hitFlashDelay = 0.2f;
 const TCODColor flashColour = TCODColor::red;
 
 // The player constructor
-Player::Player(): lvl(0), xp(0), xpnext(xpLevel(1)), x(MAP_WIDTH/2), y(MAP_HEIGHT/2), colour(TCODColor::white), gp(100), walkTimer(0.0f), magicTimer(0.0f), hitFlashTimer(0.0f)
+Player::Player(): lvl(0), xp(0), xpnext(xpLevel(1)), x(MAP_WIDTH/2), y(MAP_HEIGHT/2), colour(TCODColor::white), gp(100), displacement(0.0f), magicTimer(0.0f), hitFlashTimer(0.0f)
 {
   sym = CHAR_PLAYER_DOWN;
   sym_up = CHAR_PLAYER_UP;
@@ -81,8 +81,8 @@ void Player::update(float elapsed, TCOD_key_t *key, TCOD_mouse_t mouse)
     game.isFaded = false;
   }
 
-  // Increment walk timer
-  walkTimer += elapsed;
+  // Increment displacement
+  displacement += elapsed*static_cast<float>(stats.spd);
 
   // Replenish MP
   mpfraction += 0.125f*elapsed*static_cast<float>(stats.wil);
@@ -169,9 +169,9 @@ void Player::update(float elapsed, TCOD_key_t *key, TCOD_mouse_t mouse)
       }
     }
 
-    if(walkTimer*static_cast<float>(stats.spd) >= 1.0f)
+    if(displacement >= 1.0f)
     {
-      walkTimer = 0.0f;
+      displacement = 0.0f;
 
       if(TCODConsole::isKeyPressed(TCODK_UP))
       {
@@ -304,9 +304,9 @@ void Player::update(float elapsed, TCOD_key_t *key, TCOD_mouse_t mouse)
   {
     WorldMap *wmap = &game.world[game.worldID];
 
-    if(walkTimer*static_cast<float>(stats.spd) >= 1.0f)
+    if(displacement >= 1.0f)
     {
-      walkTimer = 0.0f;
+      displacement = 0.0f;
 
       if(TCODConsole::isKeyPressed(TCODK_UP))
       {
@@ -861,7 +861,7 @@ void Player::stayInn()
     }
 
     // Crossfade between the two sound channels
-    if(game.sound.crossFading) game.sound.crossFade(TCODSystem::getLastFrameLength());
+    if(game.sound.crossFading) game.sound.crossFade(1.0f/static_cast<float>(FPSMAX));
 
     TCODConsole::setFade(fade, TCODColor::black);
     TCODConsole::flush();
