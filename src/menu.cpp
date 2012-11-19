@@ -74,7 +74,7 @@ void Menu::updateMainMenu(TCOD_key_t key)
   const char options[NMAIN][CHARMAX] = {
             "%cNew Game %c",
             "%cLoad Game%c",
-            "%cGame Info%c",
+            "%cGame Help%c",
             "%cQuit Game%c"};
 
   // Main menu screen
@@ -192,7 +192,7 @@ void Menu::updateInfoPage(TCOD_key_t key)
   TCODConsole::setColorControl(TCOD_COLCTRL_2, TCODColor::red, TCODColor::black);
 
   // Print frame and title
-  subcon->printFrame(0, 0, w, h, false, TCOD_BKGND_SET, "Game Info");
+  subcon->printFrame(0, 0, w, h, false, TCOD_BKGND_SET, "Game Help");
 
   // Print the information page contents
   int x = 4, y = 6;
@@ -328,7 +328,7 @@ bool Menu::updateGameMenu(TCOD_key_t key)
   // Game submenu screen
   subcon = new TCODConsole(ws, hs);
 
-  game.player.updateStats();
+  //game.player.updateStats();
 
   // Key handler
   switch(key.vk)

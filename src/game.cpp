@@ -69,20 +69,20 @@ Game::Game(): inCaves(false), isFaded(false), worldID(0), caveID(0), magicID(0),
   weather = new TCODNoise(3, rng);
 
   p = 0.5f;
-  //printf("Before: %f\n", p);
+  printf("Before: %f\n", p);
   offsetW = 0.5f*(1.0f + torch->get(&p)); //0.18f;
-  //printf("After #1: %f\n", p);
+  printf("After #1: %f\n", p);
   p += 0.5f;
-  //printf("After #2: %f\n", p);
+  printf("After #2: %f\n", p);
   offsetC = 0.5f*(1.0f + torch->get(&p)); //0.23f;
-  //printf("After #3: %f\n", p);
-  //printf("%f %f\n", offsetW, offsetC);
+  printf("After #3: %f\n", p);
+  printf("%f %f\n", offsetW, offsetC);
 
   player.x = IMAGE_WIDTH/2;
   player.y = IMAGE_HEIGHT/2 + 1;
 
-	//guardian = NULL;
-	//boss = NULL;
+//  guardian = NULL;
+//  boss = NULL;
 }
 
 Game::~Game()
@@ -99,11 +99,11 @@ Game::~Game()
   if(weather) delete weather;
   weather = NULL;
 
-	//if(guardian) delete guardian;
-	//guardian = NULL;
+//  if(guardian) delete guardian;
+//  guardian = NULL;
 
-	//if(boss) delete boss;
-	//boss = NULL;
+//  if(boss) delete boss;
+//  boss = NULL;
 }
 
 // This method initializes the game
@@ -634,8 +634,11 @@ void Game::renderIntro()
 bool Game::newGame()
 {
   bool status = true;
-  uint32 tstop, tstart = TCODSystem::getElapsedMilli();
-  int tsleep;
+	int counter = 0;
+
+#ifndef NOSOUND
+  uint32 tstart = TCODSystem::getElapsedMilli();
+#endif
 
   // Play the music for the current map
   sound.play(SOUND_BUILD_MAP);
@@ -650,13 +653,13 @@ bool Game::newGame()
   // Initialize all maps
   float fraction = 0.0f;
   displayProgress("Generating Serpentine Caves", fraction);
-  for(worldID = 0; worldID < NWORLD; worldID++)
+  for(worldID = 0; worldID < NWORLDMAPS; worldID++)
   {
-    if(worldID >= 1 && worldID < NTEMPLES + 1)
+    if(worldID >= 1 && worldID <= NTEMPLES)
     {
       world[worldID].loadMap("data/img/templemap.png", "Temple Map", SOUND_TEMPLE_MAP);
     }
-    else if(worldID >= NTEMPLES + 1 && worldID < NTEMPLES + NTOWNS + 1)
+    else if(worldID >= NTEMPLES + 1 && worldID <= NTEMPLES + NTOWNS)
     {
       world[worldID].loadMap("data/img/townmap.png", "Town Map", SOUND_TOWN_MAP);
     }
@@ -673,21 +676,21 @@ bool Game::newGame()
       // Setup their economy
       setupEconomy();
     }
-    fraction = static_cast<float>(worldID)/static_cast<float>(NWORLD + NCAVE_REGIONS*NLEVELS_REGION - 1);
+    fraction = static_cast<float>(++counter)/static_cast<float>(NWORLDMAPS + NCAVEMAPS);
     displayProgress("Generating Serpentine Caves", fraction);
 
     // Crossfade between the two sound channels
-    if(sound.crossFading) sound.crossFade(1.0f/static_cast<float>(FPSMAX));
+    if(sound.crossFading) sound.crossFade(1.0/static_cast<float>(FPSMAX));
   }
 
-  for(caveID = 0; caveID < NCAVE_REGIONS*NLEVELS_REGION; caveID++)
+  for(caveID = 0; caveID < NCAVEMAPS; caveID++)
   {
     caves[caveID].finalizeMap(caveID);
-    fraction = static_cast<float>(caveID + NWORLD)/static_cast<float>(NWORLD + NCAVE_REGIONS*NLEVELS_REGION - 1);
+    fraction = static_cast<float>(++counter)/static_cast<float>(NWORLDMAPS + NCAVEMAPS);
     displayProgress("Generating Serpentine Caves", fraction);
 
     // Crossfade between the two sound channels
-    if(sound.crossFading) sound.crossFade(1.0f/static_cast<float>(FPSMAX));
+    if(sound.crossFading) sound.crossFade(1.0/static_cast<float>(FPSMAX));
   }
   TCODConsole::root->setDefaultBackground(TCODColor::black);
 
@@ -701,10 +704,10 @@ bool Game::newGame()
 
   sound.first = true;
 
-  tstop = TCODSystem::getElapsedMilli();
-  tsleep = 29000 - (tstop - tstart);
-
 #ifndef NOSOUND
+  uint32 tstop = TCODSystem::getElapsedMilli();
+  int tsleep = 29000 - (tstop - tstart);
+
   // Pause for the build music
   if(tsleep > 0) TCODSystem::sleepMilli(tsleep);
 #endif
@@ -723,7 +726,7 @@ bool Game::newGame()
 bool Game::saveGame(bool init)
 {
   bool status = true;
-  int nb = 0;
+  int nb = 0, counter = 0;
 
   // Define zip object
   zip = new TCODZip();
@@ -738,22 +741,22 @@ bool Game::saveGame(bool init)
   zip->putInt(seed);
 
   // Store world data
-  for(int i = 0; i < NWORLD; i++)
+  for(int i = 0; i < NWORLDMAPS; i++)
   {
     nb = sizeof(world[i]);
     zip->putInt(nb);
     zip->putData(nb, &world[i]);
-    fraction = static_cast<float>(i)/static_cast<float>(NWORLD + NCAVE_REGIONS*NLEVELS_REGION + 1);
+    fraction = static_cast<float>(++counter)/static_cast<float>(NWORLDMAPS + NCAVEMAPS + 2);
     if(init) displayProgress("Saving Serpentine Caves", fraction);
   }
 
   // Store cave data
-  for(int i = 0; i < NCAVE_REGIONS*NLEVELS_REGION; i++)
+  for(int i = 0; i < NCAVEMAPS; i++)
   {
     nb = sizeof(caves[i]);
     zip->putInt(nb);
     zip->putData(nb, &caves[i]);
-    fraction = static_cast<float>(i + NWORLD)/static_cast<float>(NWORLD + NCAVE_REGIONS*NLEVELS_REGION + 1);
+    fraction = static_cast<float>(++counter)/static_cast<float>(NWORLDMAPS + NCAVEMAPS + 2);
     if(init) displayProgress("Saving Serpentine Caves", fraction);
   }
 
@@ -761,14 +764,14 @@ bool Game::saveGame(bool init)
   nb = sizeof(menu);
   zip->putInt(nb);
   zip->putData(nb, &menu);
-  fraction = static_cast<float>(NWORLD + NCAVE_REGIONS*NLEVELS_REGION)/static_cast<float>(NWORLD + NCAVE_REGIONS*NLEVELS_REGION + 1);
+  fraction = static_cast<float>(++counter)/static_cast<float>(NWORLDMAPS + NCAVEMAPS + 2);
   if(init) displayProgress("Saving Serpentine Caves", fraction);
 
   // Store player data
   nb = sizeof(player);
   zip->putInt(nb);
   zip->putData(nb, &player);
-  fraction = static_cast<float>(NWORLD + NCAVE_REGIONS*NLEVELS_REGION + 1)/static_cast<float>(NWORLD + NCAVE_REGIONS*NLEVELS_REGION + 1);
+  fraction = static_cast<float>(++counter)/static_cast<float>(NWORLDMAPS + NCAVEMAPS + 2);
   if(init) displayProgress("Saving Serpentine Caves", fraction);
 
   // Write to save file
@@ -785,7 +788,7 @@ bool Game::saveGame(bool init)
 bool Game::loadGame()
 {
   bool status = true;
-  int nb = 0;
+  int nb = 0, counter = 0;
 
   // Define zip object
   zip = new TCODZip();
@@ -826,7 +829,7 @@ bool Game::loadGame()
   // Load world data
   float fraction = 0.0f;
   displayProgress("Loading Serpentine Caves", fraction);
-  for(worldID = 0; worldID < NWORLD; worldID++)
+  for(worldID = 0; worldID < NWORLDMAPS; worldID++)
   {
     nb = zip->getInt();
     zip->getData(nb, &world[worldID]);
@@ -854,12 +857,12 @@ bool Game::loadGame()
       world[worldID].loadMap("data/img/worldmap.png", "World Map", SOUND_WORLD_MAP, false);
       for(int i = 0; i < world[worldID].nnpcs; i++) world[worldID].npcs[i].path = NULL;
     }
-    fraction = static_cast<float>(worldID)/static_cast<float>(NWORLD + NCAVE_REGIONS*NLEVELS_REGION + 1);
+    fraction = static_cast<float>(++counter)/static_cast<float>(NWORLDMAPS + NCAVEMAPS);
     displayProgress("Loading Serpentine Caves", fraction);
   }
 
   // Load cave data
-  for(caveID = 0; caveID < NCAVE_REGIONS*NLEVELS_REGION; caveID++)
+  for(caveID = 0; caveID < NCAVEMAPS; caveID++)
   {
     nb = zip->getInt();
     zip->getData(nb, &caves[caveID]);
@@ -876,7 +879,7 @@ bool Game::loadGame()
     caves[caveID].loadMap();
     //for(int i = 0; i < caves[caveID].ncreatures; i++) caves[caveID].creatures[i].path = NULL;
 
-    fraction = static_cast<float>(caveID + NWORLD)/static_cast<float>(NWORLD + NCAVE_REGIONS*NLEVELS_REGION + 1);
+    fraction = static_cast<float>(++counter)/static_cast<float>(NWORLDMAPS + NCAVEMAPS + 2);
     displayProgress("Loading Serpentine Caves", fraction);
   }
   TCODConsole::root->setDefaultBackground(TCODColor::black);
@@ -905,7 +908,7 @@ bool Game::loadGame()
   menu.msgcon->printFrame(0, 0, 3*DISPLAY_WIDTH/4 - 2, NMSGS + 4, false, TCOD_BKGND_SET, "Message Log");
   for(int i = 0; i < NMSGS; i++) menu.msgcon->print(2, NMSGS + 1 - i, menu.messageLog[i]);
 
-  fraction = static_cast<float>(NWORLD + NCAVE_REGIONS*NLEVELS_REGION)/static_cast<float>(NWORLD + NCAVE_REGIONS*NLEVELS_REGION + 1);
+  fraction = static_cast<float>(++counter)/static_cast<float>(NWORLDMAPS + NCAVEMAPS + 2);
   displayProgress("Loading Serpentine Caves", fraction);
 
   // Load player data
@@ -916,7 +919,7 @@ bool Game::loadGame()
   // Update player stats
   player.updateStats();
 
-  fraction = static_cast<float>(NWORLD + NCAVE_REGIONS*NLEVELS_REGION + 1)/static_cast<float>(NWORLD + NCAVE_REGIONS*NLEVELS_REGION + 1);
+  fraction = static_cast<float>(++counter)/static_cast<float>(NWORLDMAPS + NCAVEMAPS + 2);
   displayProgress("Loading Serpentine Caves", fraction);
 
   // Free zip object
@@ -963,18 +966,6 @@ void Game::handleInput(TCOD_key_t *key, TCOD_mouse_t mouse)
   {
     // Toggle the pause
     sound.togglePause();
-  }
-  else if(key->vk == TCODK_KPMUL)
-  {
-    // Toggle the pause
-    player.stats.spd++;
-    printf("SPD: %d\n", player.stats.spd);
-  }
-  else if(key->vk == TCODK_KPDIV)
-  {
-    // Toggle the pause
-    player.stats.spd--;
-    printf("SPD: %d\n", player.stats.spd);
   }
   else if(key->vk == TCODK_BACKSPACE)
   {
@@ -1336,7 +1327,7 @@ bool Game::update(float elapsed, TCOD_key_t key, TCOD_mouse_t mouse)
 
       // Update creatures
       //aiDirector.update(elapsed);
-      cmap->updateCreatures(player, elapsed);
+      cmap->updateCreatures(&player, elapsed);
 
       // Update magic
       //TCODList <Magic *> magicToRemove;

@@ -111,10 +111,10 @@ class Creature
 
   void updateStats();                                    // Update Creature stats
 
-  void chasePlayer(CaveMap *cmap, Player player);        // Creature chases the Player
-  void avoidPlayer(CaveMap *cmap, Player player);        // Creature avoids the Player
+  void chasePlayer(CaveMap *cmap, Player *player);       // Creature chases the Player
+  void avoidPlayer(CaveMap *cmap, Player *player);       // Creature avoids the Player
 
-  void update(Player player, float elapsed);             // Update Creature
+  void update(Player *player, float elapsed);            // Update Creature
   void render(Player player);                            // Render Creature
 };
 

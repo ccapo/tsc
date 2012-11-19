@@ -251,7 +251,7 @@ void WorldMap::loadMap(const char filename[], const char name[], int musicIndex,
     // Assign the location of all the places on the world map
     if(init)
     {
-      nlocations = NWORLD;
+      nlocations = NWORLDLOCATIONS;
       nnpcs = 0;
       addWorldMapLocations();
     }
@@ -836,10 +836,10 @@ void CaveMap::finalizeMap(int level)
   int nWalkable, px, py;
   float fWalkable = 0.0f;
 
-  if(level < NCAVE_REGIONS - 1)
+  if(level < NCAVEMAPS - 1)
   {
-    nitems = 4 + static_cast<int>((NITEMMAX - 4)*(static_cast<float>(level)/static_cast<float>(NCAVE_REGIONS - 1)));
-    ncreatures = 16 + static_cast<int>((NCREATUREMAX - 16)*(static_cast<float>(level)/static_cast<float>(NCAVE_REGIONS - 1)));
+    nitems = 4 + static_cast<int>((NITEMMAX - 4)*(static_cast<float>(level)/static_cast<float>(NCAVEMAPS - 1)));
+    ncreatures = 16 + static_cast<int>((NCREATUREMAX - 16)*(static_cast<float>(level)/static_cast<float>(NCAVEMAPS - 1)));
     ncorpses = nhides = NCORPSEMAX;
     nlocations = 2;
 
@@ -1252,7 +1252,7 @@ void CaveMap::removeCreature(int x, int y)
 }
 
 // Update all the Creatures in the cave
-void CaveMap::updateCreatures(Player player, float elapsed)
+void CaveMap::updateCreatures(Player *player, float elapsed)
 {
   for(int i = 0; i < NCREATUREMAX; i++) creatures[i].update(player, elapsed);
 }

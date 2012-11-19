@@ -88,8 +88,8 @@ enum ECaves
   CAVE_05,
   CAVE_06,
   CAVE_07,
-  NWORLD,
-  NCAVES = NWORLD - NTEMPLES - NTOWNS
+  NWORLDLOCATIONS,
+  NCAVES = NWORLDLOCATIONS - NTEMPLES - NTOWNS
 };
 
 class Player;
@@ -242,7 +242,7 @@ class CaveMap
   void addCreature(int caveRegion, int x, int y);
   void removeCreature(int x, int y);
   void attackCreature(int x, int y);
-  void updateCreatures(Player player, float elapsed);
+  void updateCreatures(Player *player, float elapsed);
 
   void addCorpse(int x, int y);
   void removeCorpse(int x, int y);

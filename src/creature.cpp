@@ -70,7 +70,7 @@ Creature::Creature(int x0, int y0, ECreatureType creatureType0): x(x0), y(y0), c
       stats.hpmax = 5; stats.mpmax = 0;               // Max. HP, Max. MP
       stats.hp = stats.hpmax; stats.mp = stats.mpmax; // HP, MP
       stats.spd = 4;                                  // SPD
-      scentThreshold = 0.5f;                          // Scent Threshold
+      scentThreshold = 0.25f;                         // Scent Threshold
       sym = CHAR_SPIDER_GREEN;                        // Symbol
       break;
     }
@@ -81,7 +81,7 @@ Creature::Creature(int x0, int y0, ECreatureType creatureType0): x(x0), y(y0), c
       stats.hpmax = 10; stats.mpmax = 0;              // Max. HP, Max. MP
       stats.hp = stats.hpmax; stats.mp = stats.mpmax; // HP, MP
       stats.spd = 4;                                  // SPD
-      scentThreshold = 0.5f;                          // Scent Threshold
+      scentThreshold = 0.25f;                         // Scent Threshold
       sym = CHAR_VERMIN_BROWN;                        // Symbol
       break;
     }
@@ -92,7 +92,7 @@ Creature::Creature(int x0, int y0, ECreatureType creatureType0): x(x0), y(y0), c
       stats.hpmax = 15; stats.mpmax = 0;              // Max. HP, Max. MP
       stats.hp = stats.hpmax; stats.mp = stats.mpmax; // HP, MP
       stats.spd = 4;                                  // SPD
-      scentThreshold = 0.5f;                          // Scent Threshold
+      scentThreshold = 0.125f;                        // Scent Threshold
       sym = CHAR_IMP_BLUE;                            // Symbol
       break;
     }
@@ -102,8 +102,8 @@ Creature::Creature(int x0, int y0, ECreatureType creatureType0): x(x0), y(y0), c
       lvl = 2;                                        // Level
       stats.hpmax = 20; stats.mpmax = 0;              // Max. HP, Max. MP
       stats.hp = stats.hpmax; stats.mp = stats.mpmax; // HP, MP
-      stats.spd = 8;                                  // SPD
-      scentThreshold = 0.5f;                          // Scent Threshold
+      stats.ap = 4; stats.spd = 6;                    // AP, SPD
+      scentThreshold = 0.0625f;                       // Scent Threshold
       sym = CHAR_GOBLIN_WARRIOR;                      // Symbol
       break;
     }
@@ -113,8 +113,8 @@ Creature::Creature(int x0, int y0, ECreatureType creatureType0): x(x0), y(y0), c
       lvl = 5;                                        // Level
       stats.hpmax = 30; stats.mpmax = 0;              // Max. HP, Max. MP
       stats.hp = stats.hpmax; stats.mp = stats.mpmax; // HP, MP
-      stats.spd = 6;                                  // SPD
-      scentThreshold = 0.5f;                          // Scent Threshold
+      stats.ap = 4; stats.spd = 6;                    // AP, SPD
+      scentThreshold = 0.0625f;                       // Scent Threshold
       sym = CHAR_ORC_HERO;                            // Symbol
       break;
     }
@@ -124,8 +124,8 @@ Creature::Creature(int x0, int y0, ECreatureType creatureType0): x(x0), y(y0), c
       lvl = 10;                                       // Level
       stats.hpmax = 50; stats.mpmax = 0;              // Max. HP, Max. MP
       stats.hp = stats.hpmax; stats.mp = stats.mpmax; // HP, MP
-      stats.spd = 4;                                  // SPD
-      scentThreshold = 0.5f;                          // Scent Threshold
+      stats.ap = 6; stats.spd = 4;                    // AP, SPD
+      scentThreshold = 0.25f;                         // Scent Threshold
       sym = CHAR_GOLEM_BROWN;                         // Symbol
       break;
     }
@@ -135,8 +135,8 @@ Creature::Creature(int x0, int y0, ECreatureType creatureType0): x(x0), y(y0), c
       lvl = 15;                                       // Level
       stats.hpmax = 65; stats.mpmax = 10;             // Max. HP, Max. MP
       stats.hp = stats.hpmax; stats.mp = stats.mpmax; // HP, MP
-      stats.spd = 10;                                 // SPD
-      scentThreshold = 0.5f;                          // Scent Threshold
+      stats.ap = 8; stats.spd = 8;                    // AP, SPD
+      scentThreshold = 0.0625f;                       // Scent Threshold
       sym = CHAR_DEMON_MAGE;                          // Symbol
       break;
     }
@@ -161,7 +161,7 @@ void Creature::updateStats()
   stats.acu = CLAMP(0, ACUMAX, stats.acu);
 }
 
-void Creature::chasePlayer(CaveMap *cmap, Player player)
+void Creature::chasePlayer(CaveMap *cmap, Player *player)
 {
   const int dx[NBORDER] = {-1, 0, 1, -1, 1, -1, 0, 1};
   const int dy[NBORDER] = {-1, -1, -1, 0, 0, 1, 1, 1};
@@ -169,12 +169,12 @@ void Creature::chasePlayer(CaveMap *cmap, Player player)
   // Chase the player's scent
   bool scentFound = false;
   int xnew = x, ynew = y;
-  float maxScent = 0.0f;
+  float maxScent = scentThreshold;
   for(int z = 0; z < NBORDER; z++)
   {
     int xz = x + dx[z], yz = y + dy[z];
     float scent = cmap->getScent(xz, yz);
-    bool atPlayer = xz == player.x && yz == player.y;
+    bool atPlayer = xz == player->x && yz == player->y;
     bool atCreature = cmap->getCreatureID(xz, yz) >= 0;
     bool atTunnelUp = xz == cmap->upx && yz == cmap->upy;
     bool atTunnelDown = xz == cmap->downx && yz == cmap->downy;
@@ -185,6 +185,12 @@ void Creature::chasePlayer(CaveMap *cmap, Player player)
       xnew = xz; ynew = yz;
       scentFound = true;
     }
+		// Attack!
+		if(atPlayer)
+		{
+			player->takeDamage(*this);
+			printf("%s Attacking Player: %d/%d\n", name, player->stats.hp, player->stats.hpmax);
+		}
   }
 
   // If didn't find any scent, move in a random direction
@@ -192,7 +198,7 @@ void Creature::chasePlayer(CaveMap *cmap, Player player)
   {
     int z = game.rng->getInt(0, 7);
     xnew = x + dx[z]; ynew = y + dy[z];
-    bool atPlayer = xnew == player.x && ynew == player.y;
+    bool atPlayer = xnew == player->x && ynew == player->y;
     bool atCreature = cmap->getCreatureID(xnew, ynew) >= 0;
     bool atTunnelUp = xnew == cmap->upx && ynew == cmap->upy;
     bool atTunnelDown = xnew == cmap->downx && ynew == cmap->downy;
@@ -214,19 +220,19 @@ void Creature::chasePlayer(CaveMap *cmap, Player player)
   }
 }
 
-void Creature::avoidPlayer(CaveMap *cmap, Player player)
+void Creature::avoidPlayer(CaveMap *cmap, Player *player)
 {
   const int dx[NBORDER] = {-1, 0, 1, -1, 1, -1, 0, 1};
   const int dy[NBORDER] = {-1, -1, -1, 0, 0, 1, 1, 1};
 
   // Avoid the player's scent
   int xnew = x, ynew = y;
-  float minScent = 100.0f;
+  float minScent = scentThreshold;
   for(int z = 0; z < NBORDER; z++)
   {
     int xz = x + dx[z], yz = y + dy[z];
     float scent = cmap->getScent(xz, yz);
-    bool atPlayer = xz == player.x && yz == player.y;
+    bool atPlayer = xz == player->x && yz == player->y;
     bool atCreature = cmap->getCreatureID(xz, yz) >= 0;
     bool atTunnelUp = xz == cmap->upx && yz == cmap->upy;
     bool atTunnelDown = xz == cmap->downx && yz == cmap->downy;
@@ -246,7 +252,7 @@ void Creature::avoidPlayer(CaveMap *cmap, Player player)
 }
 
 // Update Creature
-void Creature::update(Player player, float elapsed)
+void Creature::update(Player *player, float elapsed)
 {
   CaveMap *cmap = &game.caves[game.caveID];
 
@@ -598,6 +604,7 @@ Npc::Npc(int x0, int y0, int spd0, ENpcType npcType0): x(x0), y(y0), spd(spd0), 
 // Update Npc
 void Npc::update(Player player, float elapsed)
 {
+  //static int walkCounter = TCODSystem::getFps() + SPDMIN - static_cast<int>(static_cast<float>(spd*TCODSystem::getFps())/24.0f);
   WorldMap *wmap = &game.world[game.worldID];
 
   if(inUse)

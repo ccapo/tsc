@@ -322,8 +322,8 @@ class Game
 
   Player player;                                                  // Player object
 
-  WorldMap world[NWORLD];                                         // All world map objects
-  CaveMap caves[NCAVE_REGIONS*NLEVELS_REGION];                    // All cave map objects
+  WorldMap world[NWORLDMAPS];                                     // All world map objects
+  CaveMap caves[NCAVEMAPS];                                       // All cave map objects
 
   Sound sound;                                                    // Sound object
   Menu menu;                                                      // Menu object

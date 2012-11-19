@@ -69,6 +69,7 @@ Player::Player(): lvl(0), xp(0), xpnext(xpLevel(1)), x(MAP_WIDTH/2), y(MAP_HEIGH
 void Player::update(float elapsed, TCOD_key_t *key, TCOD_mouse_t mouse)
 {
   static float mpfraction = 0.0f;
+  //static int walkCounter = TCODSystem::getFps() + SPDMIN - static_cast<int>(static_cast<float>(stats.spd*TCODSystem::getFps())/24.0f);
 
   // Fade in
   if(game.isFaded)
@@ -292,7 +293,7 @@ void Player::update(float elapsed, TCOD_key_t *key, TCOD_mouse_t mouse)
     }
     if(key->lalt && key->vk == TCODK_PAGEDOWN)
     {
-      if(game.caveID != NCAVE_REGIONS - 1)
+      if(game.caveID != NCAVEMAPS - 1)
       {
         x = cmap->downx; y = cmap->downy;
       }
@@ -537,7 +538,7 @@ void Player::updateStatus()
     game.menu.displayInnMenu = false;
     game.menu.displayFerryMenu = false;
     game.menu.displayDeathMsg = true;
-    sym = '%';
+    sym = CHAR_SKULL;
     colour = TCODColor::darkRed;
 
     // Print to message log
@@ -553,7 +554,9 @@ void Player::takeDamage(Creature cr)
   int damage = CLAMP(0, 1000, cr.stats.ap/2 - stats.dp/4);
 
   stats.hp -= damage;
-  printf("Player  : %d %d\n", stats.hp, damage);
+	stats.hp = CLAMP(0, stats.hpmax, stats.hp);
+	if(damage > 0) hitFlash();
+	updateStatus();
 }
 
 // Player action on the world map
@@ -721,7 +724,7 @@ void Player::exitCaveLocation()
   {
     game.caveID++;
 
-    if(game.caveID < NCAVE_REGIONS)
+    if(game.caveID < NCAVEMAPS)
     {
       // Fade out
       for(int fade = 255; fade >= 0; fade -= 25)
@@ -734,7 +737,7 @@ void Player::exitCaveLocation()
       if(path) delete path;
       cmap = &game.caves[game.caveID];
       x = cmap->upx; y = cmap->upy;
-      if(game.caveID % NLEVELS_REGION == 0 || game.caveID == NCAVE_REGIONS - 1) game.sound.first = true;
+      if(game.caveID % NLEVELS_REGION == 0 || game.caveID == NCAVEMAPS - 1) game.sound.first = true;
       path = new TCODPath(cmap->fov1x);
       path->compute(cmap->upx, cmap->upy, cmap->downx, cmap->downy);
 
@@ -743,7 +746,7 @@ void Player::exitCaveLocation()
     }
     else
     {
-      game.caveID = NCAVE_REGIONS - 1;
+      game.caveID = NCAVEMAPS - 1;
       game.sound.first = true;
     }
   }
@@ -793,7 +796,7 @@ void Player::exitCaveLocation()
       if(path) delete path;
       cmap = &game.caves[game.caveID];
       x = cmap->downx; y = cmap->downy;
-      if((game.caveID + 1) % NLEVELS_REGION == 0 || game.caveID == NCAVE_REGIONS - 2) game.sound.first = true;
+      if((game.caveID + 1) % NLEVELS_REGION == 0 || game.caveID == NCAVEMAPS - 2) game.sound.first = true;
       path = new TCODPath(cmap->fov1x);
       path->compute(cmap->downx, cmap->downy, cmap->upx, cmap->upy);
 
@@ -861,7 +864,7 @@ void Player::stayInn()
     }
 
     // Crossfade between the two sound channels
-    if(game.sound.crossFading) game.sound.crossFade(1.0f/static_cast<float>(FPSMAX));
+    if(game.sound.crossFading) game.sound.crossFade(1.0/static_cast<float>(FPSMAX));
 
     TCODConsole::setFade(fade, TCODColor::black);
     TCODConsole::flush();

@@ -106,11 +106,17 @@ using namespace std;
 #define NREGIONS 4
 #define NITEMS_REGION (NITEMS/NREGIONS)
 
+// Number of world maps
+#define NWORLDMAPS (NTEMPLES + NTOWNS + 1)
+
 // Number of cave regions
-#define NCAVE_REGIONS 4
+#define NCAVE_REGIONS 3
 
 // Number of cave levels per region
-#define NLEVELS_REGION 1
+#define NLEVELS_REGION 5
+
+// Number of cave maps
+#define NCAVEMAPS (NCAVE_REGIONS*NLEVELS_REGION + 1)
 
 // Number of commands in the info menu
 #define NINFO 8
