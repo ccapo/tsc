@@ -56,6 +56,7 @@ class Player
   public:
   Stats base;                                   // Player's Base Stats
   Stats stats;                                  // Player's Current Stats
+  int hp, mp;                                   // Player's Current HP and MP
   Health health;                                // Player's Health Status
   int lvl;                                      // Player's Level
   int xp, xpnext;                               // Experience Points, Experience Points for Next Level

@@ -65,20 +65,18 @@ const char *statusName[NSTATUS] = {
 };
 
 // The Stats Constructor
-Stats::Stats(): hpmax(HPMIN), hp(HPMIN), ap(APMIN), dp(DPMIN), str(STRMIN), spd((SPDMAX - SPDMIN)/2), mpmax(MPMIN), mp(MPMIN), map(MAPMIN), mdp(MDPMIN), wil(WILMIN), acu(ACUMIN) {}
+Stats::Stats(): hpmax(HPMIN), ap(APMIN), dp(DPMIN), str(STRMIN), spd((SPDMAX - SPDMIN)/2), mpmax(MPMIN), map(MAPMIN), mdp(MDPMIN), wil(WILMIN), acu(ACUMIN) {}
 
 // The Compound Assignment Operator
 Stats &Stats::operator+= (const Stats &rhs)
 {
   // Do the compound assignment work
   //this->hpmax += rhs.hpmax;
-  this->hp    += rhs.hp;
   this->ap    += rhs.ap;
   this->dp    += rhs.dp;
   this->str   += rhs.str;
   this->spd   += rhs.spd;
   //this->mpmax += rhs.mpmax;
-  this->mp    += rhs.mp;
   this->map   += rhs.map;
   this->mdp   += rhs.mdp;
   this->wil   += rhs.wil;
@@ -91,14 +89,10 @@ Stats &Stats::operator+= (const Stats &rhs)
 Stats &Stats::operator-= (const Stats &rhs)
 {
   // Do the compound assignment work
-  //this->hpmax -= rhs.hpmax;
-  this->hp    -= rhs.hp;
   this->ap    -= rhs.ap;
   this->dp    -= rhs.dp;
   this->str   -= rhs.str;
   this->spd   -= rhs.spd;
-  //this->mpmax -= rhs.mpmax;
-  this->mp    -= rhs.mp;
   this->map   -= rhs.map;
   this->mdp   -= rhs.mdp;
   this->wil   -= rhs.wil;

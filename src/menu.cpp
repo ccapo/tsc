@@ -328,7 +328,7 @@ bool Menu::updateGameMenu(TCOD_key_t key)
   // Game submenu screen
   subcon = new TCODConsole(ws, hs);
 
-  //game.player.updateStats();
+  game.player.updateStats();
 
   // Key handler
   switch(key.vk)
@@ -495,11 +495,11 @@ bool Menu::updateGameMenu(TCOD_key_t key)
 
   int x = 3, y = 12;
   con->print(x, y, "%cHP:%c", TCOD_COLCTRL_3, TCOD_COLCTRL_STOP);
-  con->print(x + 4, y++, "%d/%d", game.player.stats.hp, game.player.stats.hpmax);
+  con->print(x + 4, y++, "%d/%d", game.player.hp, game.player.stats.hpmax);
   y++;
 
   con->print(x, y, "%cMP:%c", TCOD_COLCTRL_3, TCOD_COLCTRL_STOP);
-  con->print(x + 4, y++, "%d/%d", game.player.stats.mp, game.player.stats.mpmax);
+  con->print(x + 4, y++, "%d/%d", game.player.mp, game.player.stats.mpmax);
   y++;
 
   con->print(x, y++, "%cStatus:%c", TCOD_COLCTRL_3, TCOD_COLCTRL_STOP);

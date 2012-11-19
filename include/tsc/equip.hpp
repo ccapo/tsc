@@ -124,6 +124,7 @@ class Equip
   char label[CHARMAX];                 // Equipment Label
   char desc[CHARMAX];                  // Equipment Description
   Stats stats;                         // Equipment Stats
+  int hp, mp;                          // Equipment HP and MP
   float mass;                          // Equipment Mass
   int price;                           // Equipment Price
 

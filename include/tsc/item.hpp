@@ -77,6 +77,7 @@ class Item
   char name[CHARMAX];         // Item Name
   char desc[CHARMAX];         // Item Description
   Stats stats;                // Item Stats
+  int hp, mp;                 // Item HP and MP
   int x, y;                   // Item Position
   TCODColor colour;           // Item Colour
   int sym;                   // Item Symbol

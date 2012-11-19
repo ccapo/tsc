@@ -65,13 +65,13 @@ Equip::Equip(const char name0[], const char label0[], const char desc0[],
   sprintf(desc, "%s", desc0);                // Description
 
   stats.hpmax = hpmax0;
-  stats.hp = 0;
+  hp = 0;
   stats.ap = ap0;
   stats.dp = dp0;
   stats.str = str0;
   stats.spd = spd0;
   stats.mpmax = mpmax0;
-  stats.mp = 0;
+  mp = 0;
   stats.map = map0;
   stats.mdp = mdp0;
   stats.wil = wil0;
@@ -86,6 +86,8 @@ Equip &Equip::operator= (const Equip &rhs)
   sprintf(this->label, "%s", rhs.label);     // Label
   sprintf(this->desc, "%s", rhs.desc);       // Description
   this->stats = rhs.stats;
+  this->hp = rhs.hp;
+  this->mp = rhs.mp;
   this->mass  = rhs.mass;
   this->price = rhs.price;
 

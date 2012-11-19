@@ -56,7 +56,7 @@ const float hitFlashDelay = 0.2f;
 const TCODColor flashColour = TCODColor::red;
 
 // The player constructor
-Player::Player(): lvl(0), xp(0), xpnext(xpLevel(1)), x(MAP_WIDTH/2), y(MAP_HEIGHT/2), colour(TCODColor::white), gp(100), displacement(0.0f), magicTimer(0.0f), hitFlashTimer(0.0f)
+Player::Player(): hp(HPMIN), mp(MPMIN), lvl(0), xp(0), xpnext(xpLevel(1)), x(MAP_WIDTH/2), y(MAP_HEIGHT/2), colour(TCODColor::white), gp(100), displacement(0.0f), magicTimer(0.0f), hitFlashTimer(0.0f)
 {
   sym = CHAR_PLAYER_DOWN;
   sym_up = CHAR_PLAYER_UP;
@@ -89,9 +89,9 @@ void Player::update(float elapsed, TCOD_key_t *key, TCOD_mouse_t mouse)
   mpfraction += 0.125f*elapsed*static_cast<float>(stats.wil);
   if(mpfraction >= 1.0f)
   {
-    stats.mp += static_cast<int>(mpfraction);
+    mp += static_cast<int>(mpfraction);
     mpfraction = 0.0f;
-    stats.mp = CLAMP(0, stats.mpmax, stats.mp);
+    mp = CLAMP(0, stats.mpmax, mp);
   }
 
   if(game.inCaves)
@@ -114,28 +114,28 @@ void Player::update(float elapsed, TCOD_key_t *key, TCOD_mouse_t mouse)
     if(mouse.lbutton_pressed)
     {
       //if(!Magic::sparkle || magicTimer < longSpellMagicTimer)
-      if(magicTimer > 0.0f && magicTimer < longSpellMagicTimer && stats.mp >= 1)
+      if(magicTimer > 0.0f && magicTimer < longSpellMagicTimer && mp >= 1)
       {
         // Quick left click: Standard Magic
         if(!atPlayer)
         {
           printf("Cast Standard Magic\n");
-          stats.mp -= 1;
-          stats.mp = CLAMP(0, stats.mpmax, stats.mp);
+          mp -= 1;
+          mp = CLAMP(0, stats.mpmax, mp);
           //Magic *m = new Magic(x, y, map_x, map_y, FB_STANDARD);
           //game.addMagic(m);
         }
       }
 
       //if(Magic::sparkle && magicTimer >= longSpellMagicTimer)
-      if(magicTimer >= longSpellMagicTimer && stats.mp >= 5)
+      if(magicTimer >= longSpellMagicTimer && mp >= 5)
       {
         // Long left click: Magic Burst
         if(!atPlayer)
         {
           printf("Cast Magic Burst\n");
-          stats.mp -= 5;
-          stats.mp = CLAMP(0, stats.mpmax, stats.mp);
+          mp -= 5;
+          mp = CLAMP(0, stats.mpmax, mp);
           //Magic *m = new Magic(x, y, map_x, map_y, FB_BURST);
           //game.addMagic(m);
         }
@@ -411,7 +411,7 @@ void Player::render()
     TCODConsole::root->putChar(cx, cy, sym, TCOD_BKGND_NONE);
 
     //if(Magic::incandescence && magicTimer > longButtonDelay)
-    if(magicTimer > longButtonDelay && stats.mp >= 5)
+    if(magicTimer > longButtonDelay && mp >= 5)
     {
       // Spell charging bar
       int barLength = 0;
@@ -457,14 +457,14 @@ void Player::updateStats()
 
   // Ensure stats stay within acceptable limits
   stats.hpmax = CLAMP(HPMIN, HPMAX, stats.hpmax);
-  stats.hp    = CLAMP(0, stats.hpmax, stats.hp);
+  hp          = CLAMP(0, stats.hpmax, hp);
   stats.ap    = CLAMP(APMIN, APMAX, stats.ap);
   stats.dp    = CLAMP(DPMIN, DPMAX, stats.dp);
   stats.str   = CLAMP(STRMIN, STRMAX, stats.str);
   stats.spd   = CLAMP(SPDMIN, SPDMAX, stats.spd);
 
   stats.mpmax = CLAMP(MPMIN, MPMAX, stats.mpmax);
-  stats.mp    = CLAMP(0, stats.mpmax, stats.mp);
+  mp          = CLAMP(0, stats.mpmax, mp);
   stats.map   = CLAMP(MAPMIN, MAPMAX, stats.map);
   stats.mdp   = CLAMP(MDPMIN, MDPMAX, stats.mdp);
   stats.wil   = CLAMP(WILMIN, WILMAX, stats.wil);
@@ -482,14 +482,14 @@ void Player::updateStatus()
   {
     lvl++;
     base.hpmax = hpLevel(lvl);
-    base.hp = base.hpmax;
+    hp = base.hpmax;
     base.ap = apLevel(lvl);
     base.dp = dpLevel(lvl);
     base.str = strLevel(lvl);
     base.spd = spdLevel(lvl);
 
     base.mpmax = mpLevel(lvl);
-    base.mp = base.mpmax;
+    mp = base.mpmax;
     base.map = mapLevel(lvl);
     base.mdp = mdpLevel(lvl);
     base.wil = wilLevel(lvl);
@@ -503,8 +503,8 @@ void Player::updateStatus()
 
   // Update the player's health status
   for(int i = 0; i <= 4; i++) health.status[i] = false; // Reset all
-  int istatus = 1 + 3*static_cast<int>(static_cast<float>(stats.hp)/static_cast<float>(stats.hpmax));
-  if(stats.hp == 0) istatus = 0;
+  int istatus = 1 + 3*static_cast<int>(static_cast<float>(hp)/static_cast<float>(stats.hpmax));
+  if(hp == 0) istatus = 0;
   health.status[istatus] = true;
 
   // Update the player's burden status
@@ -553,8 +553,8 @@ void Player::takeDamage(Creature cr)
 {
   int damage = CLAMP(0, 1000, cr.stats.ap/2 - stats.dp/4);
 
-  stats.hp -= damage;
-	stats.hp = CLAMP(0, stats.hpmax, stats.hp);
+  hp -= damage;
+	hp = CLAMP(0, stats.hpmax, hp);
 	if(damage > 0) hitFlash();
 	updateStatus();
 }
@@ -873,7 +873,7 @@ void Player::stayInn()
   game.isFaded = true;
   game.sound.first = true;
 
-  stats.hp = stats.hpmax; stats.mp = stats.mpmax;
+  hp = stats.hpmax; mp = stats.mpmax;
   for(int i = 0; i < NSTATUS; i++) health.status[i] = false;
   health.status[STATUS_HEALTHY] = true;
 
@@ -1009,10 +1009,10 @@ void Player::useItem(int *cursorIndex)
     game.menu.updateMessageLog(buffer);
 
     // Update the player's base stats
-    base.hp += item.stats.hp;
+    hp += item.hp;
     base.str += item.stats.str;
     base.spd += item.stats.spd;
-    base.mp += item.stats.mp;
+    mp += item.mp;
     base.wil += item.stats.wil;
     base.acu += item.stats.acu;
 

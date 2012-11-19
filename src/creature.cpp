@@ -51,7 +51,7 @@
 #include "main.hpp"
 
 // The default creature constructor
-Creature::Creature(): lvl(1), x(0), y(0), creatureType(CREATURETYPE_INSECT), colour(TCODColor::white), displacement(1.0f), scentThreshold(0.0f), inUse(false)
+Creature::Creature(): hp(5), mp(0), lvl(1), x(0), y(0), creatureType(CREATURETYPE_INSECT), colour(TCODColor::white), displacement(1.0f), scentThreshold(0.0f), inUse(false)
 {
   sprintf(name, "%s", "Green Spider");
   sym = CHAR_SPIDER_GREEN;
@@ -68,7 +68,7 @@ Creature::Creature(int x0, int y0, ECreatureType creatureType0): x(x0), y(y0), c
       sprintf(name, "%s", "Green Spider");            // Name
       lvl = 1;                                        // Level
       stats.hpmax = 5; stats.mpmax = 0;               // Max. HP, Max. MP
-      stats.hp = stats.hpmax; stats.mp = stats.mpmax; // HP, MP
+      hp = stats.hpmax; mp = stats.mpmax; // HP, MP
       stats.spd = 4;                                  // SPD
       scentThreshold = 0.25f;                         // Scent Threshold
       sym = CHAR_SPIDER_GREEN;                        // Symbol
@@ -79,7 +79,7 @@ Creature::Creature(int x0, int y0, ECreatureType creatureType0): x(x0), y(y0), c
       sprintf(name, "%s", "Brown Vermin");            // Name
       lvl = 1;                                        // Level
       stats.hpmax = 10; stats.mpmax = 0;              // Max. HP, Max. MP
-      stats.hp = stats.hpmax; stats.mp = stats.mpmax; // HP, MP
+      hp = stats.hpmax; mp = stats.mpmax; // HP, MP
       stats.spd = 4;                                  // SPD
       scentThreshold = 0.25f;                         // Scent Threshold
       sym = CHAR_VERMIN_BROWN;                        // Symbol
@@ -90,7 +90,7 @@ Creature::Creature(int x0, int y0, ECreatureType creatureType0): x(x0), y(y0), c
       sprintf(name, "%s", "Blue Imp");                // Name
       lvl = 1;                                        // Level
       stats.hpmax = 15; stats.mpmax = 0;              // Max. HP, Max. MP
-      stats.hp = stats.hpmax; stats.mp = stats.mpmax; // HP, MP
+      hp = stats.hpmax; mp = stats.mpmax; // HP, MP
       stats.spd = 4;                                  // SPD
       scentThreshold = 0.125f;                        // Scent Threshold
       sym = CHAR_IMP_BLUE;                            // Symbol
@@ -101,7 +101,7 @@ Creature::Creature(int x0, int y0, ECreatureType creatureType0): x(x0), y(y0), c
       sprintf(name, "%s", "Goblin Warrior");          // Name
       lvl = 2;                                        // Level
       stats.hpmax = 20; stats.mpmax = 0;              // Max. HP, Max. MP
-      stats.hp = stats.hpmax; stats.mp = stats.mpmax; // HP, MP
+      hp = stats.hpmax; mp = stats.mpmax; // HP, MP
       stats.ap = 4; stats.spd = 6;                    // AP, SPD
       scentThreshold = 0.0625f;                       // Scent Threshold
       sym = CHAR_GOBLIN_WARRIOR;                      // Symbol
@@ -112,7 +112,7 @@ Creature::Creature(int x0, int y0, ECreatureType creatureType0): x(x0), y(y0), c
       sprintf(name, "%s", "Orc Hero");                // Name
       lvl = 5;                                        // Level
       stats.hpmax = 30; stats.mpmax = 0;              // Max. HP, Max. MP
-      stats.hp = stats.hpmax; stats.mp = stats.mpmax; // HP, MP
+      hp = stats.hpmax; mp = stats.mpmax; // HP, MP
       stats.ap = 4; stats.spd = 6;                    // AP, SPD
       scentThreshold = 0.0625f;                       // Scent Threshold
       sym = CHAR_ORC_HERO;                            // Symbol
@@ -123,7 +123,7 @@ Creature::Creature(int x0, int y0, ECreatureType creatureType0): x(x0), y(y0), c
       sprintf(name, "%s", "Brown Golem");             // Name
       lvl = 10;                                       // Level
       stats.hpmax = 50; stats.mpmax = 0;              // Max. HP, Max. MP
-      stats.hp = stats.hpmax; stats.mp = stats.mpmax; // HP, MP
+      hp = stats.hpmax; mp = stats.mpmax; // HP, MP
       stats.ap = 6; stats.spd = 4;                    // AP, SPD
       scentThreshold = 0.25f;                         // Scent Threshold
       sym = CHAR_GOLEM_BROWN;                         // Symbol
@@ -134,7 +134,7 @@ Creature::Creature(int x0, int y0, ECreatureType creatureType0): x(x0), y(y0), c
       sprintf(name, "%s", "Demon Mage");              // Name
       lvl = 15;                                       // Level
       stats.hpmax = 65; stats.mpmax = 10;             // Max. HP, Max. MP
-      stats.hp = stats.hpmax; stats.mp = stats.mpmax; // HP, MP
+      hp = stats.hpmax; mp = stats.mpmax; // HP, MP
       stats.ap = 8; stats.spd = 8;                    // AP, SPD
       scentThreshold = 0.0625f;                       // Scent Threshold
       sym = CHAR_DEMON_MAGE;                          // Symbol
@@ -149,12 +149,12 @@ Creature::Creature(int x0, int y0, ECreatureType creatureType0): x(x0), y(y0), c
 void Creature::updateStats()
 {
   // Ensure stats stay within acceptable limits
-  stats.hp  = CLAMP(0, stats.hpmax, stats.hp);
+  hp        = CLAMP(0, stats.hpmax, hp);
   stats.ap  = CLAMP(0, APMAX, stats.ap);
   stats.dp  = CLAMP(0, DPMAX, stats.dp);
   stats.str = CLAMP(0, STRMAX, stats.str);
   stats.spd = CLAMP(0, SPDMAX, stats.spd);
-  stats.mp  = CLAMP(0, stats.mpmax, stats.mp);
+  mp        = CLAMP(0, stats.mpmax, mp);
   stats.map = CLAMP(0, MAPMAX, stats.map);
   stats.mdp = CLAMP(0, MDPMAX, stats.mdp);
   stats.wil = CLAMP(0, WILMAX, stats.wil);
@@ -189,7 +189,7 @@ void Creature::chasePlayer(CaveMap *cmap, Player *player)
 		if(atPlayer)
 		{
 			player->takeDamage(*this);
-			printf("%s Attacking Player: %d/%d\n", name, player->stats.hp, player->stats.hpmax);
+			printf("%s Attacking Player: %d/%d\n", name, player->hp, player->stats.hpmax);
 		}
   }
 
@@ -281,7 +281,7 @@ void Creature::update(Player *player, float elapsed)
         }
         case CREATURETYPE_REPTILE:
         {
-          if(stats.hp > stats.hpmax/2)
+          if(hp > stats.hpmax/2)
           {
             // Chase the player's scent
             chasePlayer(cmap, player);
@@ -295,7 +295,7 @@ void Creature::update(Player *player, float elapsed)
         }
         case CREATURETYPE_BEAST:
         {
-          if(stats.hp > stats.hpmax/4)
+          if(hp > stats.hpmax/4)
           {
             // Chase the player's scent
             chasePlayer(cmap, player);

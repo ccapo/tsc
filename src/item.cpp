@@ -59,13 +59,13 @@ Item::Item(): x(0), y(0), colour(TCODColor::white), sym(CHAR_MUSHROOM),
   sprintf(desc, "%s",  "Unidentified Mushroom");         // Description
 
   stats.hpmax = 0;
-  stats.hp = 0;
+  hp = 0;
   stats.ap = 0;
   stats.dp = 0;
   stats.str = 0;
   stats.spd = 0;
   stats.mpmax = 0;
-  stats.mp = 0;
+  mp = 0;
   stats.map = 0;
   stats.mdp = 0;
   stats.wil = 0;
@@ -83,13 +83,13 @@ Item::Item(const char label0[], const char name0[], const char desc0[],
   sprintf(desc, "%s",  desc0);  // Description
 
   stats.hpmax = 0;
-  stats.hp = hp0;
+  hp = hp0;
   stats.ap = 0;
   stats.dp = 0;
   stats.str = str0;
   stats.spd = spd0;
   stats.mpmax = 0;
-  stats.mp = mp0;
+  mp = mp0;
   stats.map = 0;
   stats.mdp = 0;
   stats.wil = wil0;

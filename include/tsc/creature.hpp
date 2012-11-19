@@ -94,6 +94,7 @@ class Creature
 {
   public:
   Stats stats;                                           // Creature's Current Stats
+  int hp, mp;                                            // Creature's Current HP and MP
   int lvl;                                               // Creature's Level
   int x, y;                                              // Creature Position
   ECreatureType creatureType;                            // Creature Type

@@ -70,10 +70,10 @@ enum EStatus
 class Stats
 {
   public:
-  int hpmax, hp;        // Max. Health Points and Current Health Points
+  int hpmax;        // Max. Health Points
   int ap, dp;        // Physical Attack and Defense Power
   int str, spd;        // Strength and Speed
-  int mpmax, mp;        // Max. Magic Points and Current Magic Points
+  int mpmax;        // Max. Magic Points
   int map, mdp;        // Magic Attack and Defense Power
   int wil, acu;        // Willpower and Acuity
 

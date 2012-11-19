@@ -589,7 +589,7 @@ void Game::renderIntro()
   // Render player hp bar
   TCODConsole::root->setDefaultForeground(TCODColor::white);
   TCODConsole::root->printEx(1, 1, TCOD_BKGND_NONE, TCOD_LEFT, "HP");
-  float hpfraction = static_cast<float>(player.stats.hp)/static_cast<float>(player.stats.hpmax);
+  float hpfraction = static_cast<float>(player.hp)/static_cast<float>(player.stats.hpmax);
   int hpbar = static_cast<int>(20.0f*hpfraction);
   if(hpbar > 0)
   {
@@ -605,7 +605,7 @@ void Game::renderIntro()
   // Render player mp bar
   TCODConsole::root->setDefaultForeground(TCODColor::white);
   TCODConsole::root->printEx(DISPLAY_WIDTH - 24, 1, TCOD_BKGND_NONE, TCOD_LEFT, "MP");
-  float mpfraction = static_cast<float>(player.stats.mp)/static_cast<float>(player.stats.mpmax);
+  float mpfraction = static_cast<float>(player.mp)/static_cast<float>(player.stats.mpmax);
   int mpbar = static_cast<int>(20.0f*mpfraction);
   if(mpbar > 0)
   {
@@ -1499,7 +1499,7 @@ void Game::render(bool *first)
       if(id >= 0 && !isPlayer && isVisible)
       {
         TCODConsole::root->setDefaultForeground(creatures[id].colour);
-        TCODConsole::root->printEx(m_x, m_y, TCOD_BKGND_NONE, align, "%s: %d/%d", creatures[id].name, creatures[id].stats.hp, creatures[id].stats.hpmax);
+        TCODConsole::root->printEx(m_x, m_y, TCOD_BKGND_NONE, align, "%s: %d/%d", creatures[id].name, creatures[id].hp, creatures[id].stats.hpmax);
       }
 
       id = cmap->getHideID(map_x, map_y);
@@ -1634,7 +1634,7 @@ void Game::render(bool *first)
   // Render player hp bar
   TCODConsole::root->setDefaultForeground(TCODColor::white);
   TCODConsole::root->printEx(1, 1, TCOD_BKGND_NONE, TCOD_LEFT, "HP");
-  float hpfraction = static_cast<float>(player.stats.hp)/static_cast<float>(player.stats.hpmax);
+  float hpfraction = static_cast<float>(player.hp)/static_cast<float>(player.stats.hpmax);
   int hpbar = static_cast<int>(20.0f*hpfraction);
   if(hpbar > 0)
   {
@@ -1650,7 +1650,7 @@ void Game::render(bool *first)
   // Render player mp bar
   TCODConsole::root->setDefaultForeground(TCODColor::white);
   TCODConsole::root->printEx(DISPLAY_WIDTH - 24, 1, TCOD_BKGND_NONE, TCOD_LEFT, "MP");
-  float mpfraction = static_cast<float>(player.stats.mp)/static_cast<float>(player.stats.mpmax);
+  float mpfraction = static_cast<float>(player.mp)/static_cast<float>(player.stats.mpmax);
   int mpbar = static_cast<int>(20.0f*mpfraction);
   if(mpbar > 0)
   {
