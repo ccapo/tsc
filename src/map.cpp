@@ -1265,7 +1265,7 @@ void CaveMap::attackCreature(int x, int y)
   if(creatures[id].hp > 0)
   {
     creatures[id].hp -= CLAMP(0, 1000, game.player.stats.ap/2 - creatures[id].stats.dp/4);
-    printf("Attacking %s: %d/%d\n", creatures[id].name, creatures[id].hp, creatures[id].stats.hpmax);
+    printf("Player Attacking %s: %d/%d\n", creatures[id].name, creatures[id].hp, creatures[id].stats.hpmax);
           
     if(creatures[id].hp <= 0)
     {

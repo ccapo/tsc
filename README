@@ -15,7 +15,7 @@ I am currently redesigning the code to make use of state machines, which will
 make the code more organized and make it easier to incorporate new components.
 
 The game is playable, but many of the components have not been implemented,
-most notably the final boss. Also, the monsters can't attack you.
+most notably the final boss.
 
 The game should compile under 32-bit and 64-bit Linux distributions, with the
 audio library FMOD working under both 32-bit and 64-bit systems. 
